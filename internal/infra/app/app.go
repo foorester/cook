@@ -9,11 +9,11 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/foorester/cook/internal/infra/config"
-	"github.com/foorester/cook/internal/infra/db"
+	"github.com/foorester/cook/internal/infra/db/pg"
 	"github.com/foorester/cook/internal/infra/errors"
 	http2 "github.com/foorester/cook/internal/infra/http"
 	"github.com/foorester/cook/internal/infra/log"
-	"github.com/foorester/cook/internal/infra/repo/pg"
+	pgrepo "github.com/foorester/cook/internal/infra/repo/pg"
 	"github.com/foorester/cook/internal/infra/sys"
 )
 
@@ -56,11 +56,11 @@ func (app *App) Run() (err error) {
 func (app *App) Setup(ctx context.Context) error {
 	app.EnableSupervisor()
 
-	// Setup db.go connections
-	db := db.NewDB(app.opts...)
+	// Setup pg.go connections
+	database := pg.NewDB(app.opts...)
 
 	// Setup store
-	repo := pg.NewRecipeRepo(db, app.opts...)
+	repo := pgrepo.NewRecipeRepo(database, app.opts...)
 
 	// Setup services
 
