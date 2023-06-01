@@ -13,7 +13,7 @@ import (
 	"github.com/foorester/cook/internal/infra/errors"
 	http2 "github.com/foorester/cook/internal/infra/http"
 	"github.com/foorester/cook/internal/infra/log"
-	pgrepo "github.com/foorester/cook/internal/infra/repo/pg"
+	pgr "github.com/foorester/cook/internal/infra/repo/pg"
 	"github.com/foorester/cook/internal/infra/sys"
 )
 
@@ -60,7 +60,7 @@ func (app *App) Setup(ctx context.Context) error {
 	database := pg.NewDB(app.opts...)
 
 	// Setup store
-	repo := pgrepo.NewRecipeRepo(database, app.opts...)
+	repo := pgr.NewRecipeRepo(database, app.opts...)
 
 	// Setup services
 
