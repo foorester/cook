@@ -1,0 +1,816 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Cook",
+    "version": "1.0",
+    "description": "Recipe Manager",
+    "contact": {
+      "name": "Adrian PK",
+      "url": "https://adrianpk.com/"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.server.test/v1",
+      "variables": {
+        "hostname": {
+          "default": "localhost"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/recipe-books": {
+      "get": {
+        "summary": "Retrieve all recipe books",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeBookList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new recipe book",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecipeBook"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Recipe book created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeBook"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recipe-books/{bookId}": {
+      "get": {
+        "summary": "Retrieve a specific recipe book",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeBook"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a specific recipe book",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecipeBook"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recipe book updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeBook"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a specific recipe book",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Recipe book deleted"
+          }
+        }
+      }
+    },
+    "/recipe-books/{bookId}/recipes": {
+      "get": {
+        "summary": "Retrieve all recipes in a recipe book",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new recipe in a recipe book",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Recipe"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Recipe created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Recipe"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recipe-books/{bookId}/recipes/{recipeId}": {
+      "get": {
+        "summary": "Retrieve a specific recipe in a recipe book",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": null
+          }
+        ]
+      },
+      "schema": {
+        "type": "string"
+      },
+      "responses": {
+        "200": {
+          "description": "Successful response",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Recipe"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a specific recipe in a recipe book",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Recipe"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recipe updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Recipe"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a specific recipe in a recipe book",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Recipe deleted"
+          }
+        }
+      }
+    },
+    "/recipe-books/{bookId}/recipes/{recipeId}/ingredients": {
+      "get": {
+        "summary": "Retrieve all ingredients in a recipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngredientList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new ingredient in a recipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ingredient"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ingredient created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ingredient"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}": {
+      "get": {
+        "summary": "Retrieve a specific ingredient in a recipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "ingredientId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ingredient"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a specific ingredient in a recipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "ingredientId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ingredient"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ingredient updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ingredient"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a specific ingredient in a recipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "ingredientId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Ingredient deleted"
+          }
+        }
+      }
+    },
+    "/recipe-books/{bookId}/recipes/{recipeId}/direction-steps": {
+      "get": {
+        "summary": "Retrieve all direction steps in a recipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectionStepList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new direction step in a recipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DirectionStep"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Direction step created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectionStep"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId}": {
+      "get": {
+        "summary": "Retrieve a specific direction step in a recipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "stepId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectionStep"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a specific direction step in a recipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "recipeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "stepId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DirectionStep"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Direction Step updated"
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DirectionStep"
+              }
+            }
+          },
+          "delete": {
+            "summary": "Delete a specific direction step in a recipe",
+            "parameters": [
+              {
+                "in": "path",
+                "name": "bookId",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              {
+                "in": "path",
+                "name": "recipeId",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              {
+                "in": "path",
+                "name": "stepId",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            ],
+            "responses": {
+              "204": {
+                "description": "Direction step deleted"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RecipeBook": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Recipe": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ingredient"
+            }
+          },
+          "directionSteps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DirectionStep"
+            }
+          }
+        }
+      },
+      "Ingredient": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          }
+        }
+      },
+      "DirectionStep": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "step": {
+            "type": "string"
+          }
+        }
+      },
+      "RecipeBookList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/RecipeBook"
+        }
+      },
+      "RecipeList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Recipe"
+        }
+      },
+      "IngredientList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Ingredient"
+        }
+      },
+      "DirectionStepList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/DirectionStep"
+        }
+      }
+    }
+  }
+}
