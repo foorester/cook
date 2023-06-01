@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
 	"github.com/foorester/cook/internal/core/model"
@@ -15,7 +16,7 @@ import (
 type (
 	RecipeRepo struct {
 		sys.Worker
-		db *db.DB
+		db db.DB
 	}
 )
 
@@ -23,7 +24,7 @@ const (
 	name = "write-store"
 )
 
-func NewRecipeRepo(db *db.DB, opts ...sys.Option) *RecipeRepo {
+func NewRecipeRepo(db db.DB, opts ...sys.Option) *RecipeRepo {
 	return &RecipeRepo{
 		Worker: sys.NewWorker(name, opts...),
 		db:     db,
@@ -40,10 +41,14 @@ func (rr *RecipeRepo) Setup(ctx context.Context) error {
 	return nil
 }
 
+func (rr *RecipeRepo) DB() *sqlx.DB {
+	return rr.db.DB()
+}
+
 func (rr *RecipeRepo) Save(ctx context.Context, r model.Recipe) (err error) {
 	recipes := []model.Recipe{r}
 
-	_, err = rr.db.NamedExec(`INSERT INTO recipes (id, name) VALUES (:id, :name)`, recipes)
+	_, err = rr.DB().NamedExec(`INSERT INTO recipes (id, name) VALUES (:id, :name)`, recipes)
 
 	if err != nil {
 		return errors.Wrap("save recipe error", err)
