@@ -15,7 +15,7 @@ Cook is designed as a reference application that focuses on managing a couple of
 
 There will be a separate code generator repository that utilizes Cook as a foundation for creating simple RESTful microservices specifically tailored for managing an intrinsically related group of resources (list-item, recipe-ingredient-directions, course-students, etc). The [code generator](https://github.com/foorester/crud) will provide developers with the ability to quickly generate the basic structure and functionality and extended later if required.
 
-While the generated code will be optimized for managing a single resource, users of this library will be not limited to its constraints and they will be able to adapt and modify the generated code to suit their specific and more complex use cases.
+While the generated code will be optimized for managing a small set of resources, developers will be not limited to this constraints and will be able to adapt and modify the generated code to suit their specific and more complex use cases.
 
 ## Usage
 
