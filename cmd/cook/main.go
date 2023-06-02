@@ -4,7 +4,7 @@ import (
 	"os"
 
 	a "github.com/foorester/cook/internal/app"
-	l "github.com/foorester/cook/internal/infra/log"
+	l "github.com/foorester/cook/internal/sys/log"
 )
 
 const (

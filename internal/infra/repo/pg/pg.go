@@ -9,8 +9,8 @@ import (
 
 	"github.com/foorester/cook/internal/core/model"
 	"github.com/foorester/cook/internal/infra/db"
-	"github.com/foorester/cook/internal/infra/errors"
 	"github.com/foorester/cook/internal/sys"
+	"github.com/foorester/cook/internal/sys/errors"
 )
 
 type (

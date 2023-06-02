@@ -1,6 +1,6 @@
 package http
 
-import "github.com/foorester/cook/internal/infra/errors"
+import "github.com/foorester/cook/internal/sys/errors"
 
 type (
 	HTTPError struct {
