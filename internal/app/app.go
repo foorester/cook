@@ -37,7 +37,6 @@ func NewApp(name, namespace string, log log.Logger) (app *App) {
 	app = &App{
 		Worker: sys.NewWorker(name, opts...),
 		opts:   opts,
-		http:   http2.NewServer("http-server", opts...),
 	}
 
 	return app
@@ -57,20 +56,22 @@ func (app *App) Run() (err error) {
 func (app *App) Setup(ctx context.Context) error {
 	app.EnableSupervisor()
 
-	// Start pg.go connections
+	// Databases
 	database := pg.NewDB(app.opts...)
 
-	// Start store
+	// Repos
 	repo := pgr.NewRecipeRepo(database, app.opts...)
 
-	// Start services
+	// Services
 	svc := service.NewService(repo, app.opts...)
 
-	// Start http handlers
+	// HTTP Server
+	app.http = http2.NewServer(app.opts...)
+	app.SetSampleRoutes() // WIP: Remove later
 
-	// Start gRPC servers
+	// gRPC servers
 
-	// Start event bus
+	// Event bus
 
 	// WIP: to avoid unused var message
 	app.Log().Debugf("Repo: %v", repo)
@@ -106,7 +107,14 @@ func (app *App) EnableSupervisor() {
 	app.supervisor = sys.NewSupervisor(name, true, app.opts)
 }
 
-// Service interface
+// SetSampleRoutes used only to test the server.
+// Using probes as sample routes for now.
+// Will be removed before rebasing main.
+func (app *App) SetSampleRoutes() {
+	probes := http2.NewRouter("probes", app.opts...)
+	probes.Mount("/", http2.Healthz)
+	app.http.Router().Mount("/healthz", probes)
+}
 
 func (app *App) RegisterHTTPHandler(http.Handler) {
 	app.Log().Infof("No registered HTTP handlers for %s", app.Name())

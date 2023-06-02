@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/foorester/cook/internal/infra/config"
-	qlog "github.com/foorester/cook/internal/infra/log"
+	"github.com/foorester/cook/internal/sys/config"
+	qlog "github.com/foorester/cook/internal/sys/log"
 )
 
 const (
