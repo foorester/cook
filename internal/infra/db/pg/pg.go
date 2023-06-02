@@ -6,8 +6,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/foorester/cook/internal/infra/errors"
 	"github.com/foorester/cook/internal/sys"
+	"github.com/foorester/cook/internal/sys/errors"
 )
 
 type (
