@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/foorester/cook/internal/infra/config"
+	"github.com/foorester/cook/internal/sys/config"
 )
 
 // TestGet default (no reload)

@@ -14,30 +14,33 @@ import (
 type (
 	Server struct {
 		sys.Worker
+		opts []sys.Option
 		http.Server
-		router http.Handler
+		router Router
 	}
 )
 
-func NewServer(name string, opts ...sys.Option) (server *Server) {
+var (
+	name = "http-server"
+)
+
+func NewServer(opts ...sys.Option) (server *Server) {
 	return &Server{
 		Worker: sys.NewWorker(name, opts...),
+		opts:   opts,
+		router: NewRouter("root-router", opts...),
 	}
 }
 
-func (srv *Server) SetRouter(router http.Handler) {
-	srv.router = router
-}
-
 func (srv *Server) Setup(ctx context.Context) error {
-	//srv.router = openapi.Handler(openAPIInterfaceImpl)
+	//srv.Mount("/api", openapi.Handler(openAPIInterfaceImpl))
 	return nil
 }
 
 func (srv *Server) Start(ctx context.Context) error {
 	srv.Server = http.Server{
 		Addr:    srv.Address(),
-		Handler: srv.router,
+		Handler: srv.Router(),
 	}
 
 	group, errGrpCtx := errgroup.WithContext(ctx)
@@ -68,6 +71,18 @@ func (srv *Server) Start(ctx context.Context) error {
 	})
 
 	return group.Wait()
+}
+
+func (srv *Server) SetRouter(r Router) {
+	srv.router = r
+}
+
+func (srv *Server) Router() (router Router) {
+	return srv.router
+}
+
+func (srv *Server) Mount(pattern string, handler http.Handler) {
+	srv.router.Mount(pattern, handler)
 }
 
 func (srv *Server) Address() string {
