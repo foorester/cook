@@ -16,10 +16,8 @@ type (
 		Name() string
 		Log() log.Logger
 		Cfg() *config.Config
-		Setup(ctx context.Context) error
 		Start(ctx context.Context) error
 		Stop(ctx context.Context) error
-		Shutdown(ctx context.Context) error
 	}
 )
 
@@ -71,11 +69,6 @@ func (bw *BaseWorker) SetCfg(cfg *config.Config) {
 	bw.cfg = cfg
 }
 
-func (bw *BaseWorker) Setup(ctx context.Context) error {
-	bw.Log().Infof("%s setup", bw.Name())
-	return nil
-}
-
 func (bw *BaseWorker) Start(ctx context.Context) error {
 	bw.Log().Infof("%s start", bw.Name())
 	return nil
@@ -83,11 +76,6 @@ func (bw *BaseWorker) Start(ctx context.Context) error {
 
 func (bw *BaseWorker) Stop(ctx context.Context) error {
 	bw.Log().Infof("%s stop", bw.Name())
-	return nil
-}
-
-func (bw *BaseWorker) Shutdown(ctx context.Context) error {
-	bw.Log().Infof("%s shutdown", bw.Name())
 	return nil
 }
 

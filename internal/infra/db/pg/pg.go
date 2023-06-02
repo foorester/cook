@@ -28,7 +28,7 @@ func NewDB(opts ...sys.Option) *DB {
 	}
 }
 
-func (db *DB) Setup(ctx context.Context) error {
+func (db *DB) Start(ctx context.Context) error {
 	return db.Connect()
 }
 
