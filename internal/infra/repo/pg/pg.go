@@ -31,8 +31,8 @@ func NewRecipeRepo(db db.DB, opts ...sys.Option) *RecipeRepo {
 	}
 }
 
-func (rr *RecipeRepo) Setup(ctx context.Context) error {
-	err := rr.db.Setup(ctx)
+func (rr *RecipeRepo) Start(ctx context.Context) error {
+	err := rr.db.Start(ctx)
 	if err != nil {
 		msg := fmt.Sprintf("%s setup error", err)
 		return errors.Wrap(msg, err)
