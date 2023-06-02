@@ -8,13 +8,14 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/foorester/cook/internal/core/service"
 	"github.com/foorester/cook/internal/infra/config"
 	"github.com/foorester/cook/internal/infra/db/pg"
 	"github.com/foorester/cook/internal/infra/errors"
 	http2 "github.com/foorester/cook/internal/infra/http"
 	"github.com/foorester/cook/internal/infra/log"
 	pgr "github.com/foorester/cook/internal/infra/repo/pg"
-	"github.com/foorester/cook/internal/infra/sys"
+	"github.com/foorester/cook/internal/sys"
 )
 
 type App struct {
@@ -63,6 +64,7 @@ func (app *App) Setup(ctx context.Context) error {
 	repo := pgr.NewRecipeRepo(database, app.opts...)
 
 	// Start services
+	svc := service.NewService(repo, app.opts...)
 
 	// Start http handlers
 
@@ -72,6 +74,7 @@ func (app *App) Setup(ctx context.Context) error {
 
 	// WIP: to avoid unused var message
 	app.Log().Debugf("Repo: %v", repo)
+	app.Log().Debugf("Service: %v", svc)
 
 	return nil
 }
