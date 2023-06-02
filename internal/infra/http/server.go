@@ -8,7 +8,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/foorester/cook/internal/infra/sys"
+	"github.com/foorester/cook/internal/sys"
 )
 
 type (
