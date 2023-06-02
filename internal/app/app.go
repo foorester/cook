@@ -9,13 +9,13 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/foorester/cook/internal/core/service"
-	"github.com/foorester/cook/internal/infra/config"
 	"github.com/foorester/cook/internal/infra/db/pg"
-	"github.com/foorester/cook/internal/infra/errors"
 	http2 "github.com/foorester/cook/internal/infra/http"
-	"github.com/foorester/cook/internal/infra/log"
 	pgr "github.com/foorester/cook/internal/infra/repo/pg"
 	"github.com/foorester/cook/internal/sys"
+	"github.com/foorester/cook/internal/sys/config"
+	"github.com/foorester/cook/internal/sys/errors"
+	"github.com/foorester/cook/internal/sys/log"
 )
 
 type App struct {

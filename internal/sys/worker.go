@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/foorester/cook/internal/infra/config"
-	"github.com/foorester/cook/internal/infra/log"
+	"github.com/foorester/cook/internal/sys/config"
+	"github.com/foorester/cook/internal/sys/log"
 )
 
 type (
