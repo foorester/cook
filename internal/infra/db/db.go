@@ -3,7 +3,7 @@ package db
 import (
 	"github.com/jmoiron/sqlx"
 
-	"github.com/foorester/cook/internal/infra/sys"
+	"github.com/foorester/cook/internal/sys"
 )
 
 type (
