@@ -1,4 +1,4 @@
-package store
+package port
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	Recipe interface {
+	RecipeRepo interface {
 		Save(ctx context.Context, recipe model.Recipe) error
 	}
 )
