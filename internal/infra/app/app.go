@@ -56,19 +56,19 @@ func (app *App) Run() (err error) {
 func (app *App) Setup(ctx context.Context) error {
 	app.EnableSupervisor()
 
-	// Setup pg.go connections
+	// Start pg.go connections
 	database := pg.NewDB(app.opts...)
 
-	// Setup store
+	// Start store
 	repo := pgr.NewRecipeRepo(database, app.opts...)
 
-	// Setup services
+	// Start services
 
-	// Setup http handlers
+	// Start http handlers
 
-	// Setup gRPC servers
+	// Start gRPC servers
 
-	// Setup event bus
+	// Start event bus
 
 	// WIP: to avoid unused var message
 	app.Log().Debugf("Repo: %v", repo)
