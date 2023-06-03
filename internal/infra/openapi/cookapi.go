@@ -4,14 +4,73 @@
 package openapi
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
+	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/go-chi/chi/v5"
 )
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Retrieve all recipe books
+	// (GET /recipe-books)
+	GetRecipeBooks(w http.ResponseWriter, r *http.Request)
+	// Create a new recipe book
+	// (POST /recipe-books)
+	PostRecipeBooks(w http.ResponseWriter, r *http.Request)
+	// Delete a specific recipe book
+	// (DELETE /recipe-books/{bookId})
+	DeleteRecipeBooksBookId(w http.ResponseWriter, r *http.Request, bookId string)
+	// Retrieve a specific recipe book
+	// (GET /recipe-books/{bookId})
+	GetRecipeBooksBookId(w http.ResponseWriter, r *http.Request, bookId string)
+	// Update a specific recipe book
+	// (PUT /recipe-books/{bookId})
+	PutRecipeBooksBookId(w http.ResponseWriter, r *http.Request, bookId string)
+	// Retrieve all recipes in a recipe book
+	// (GET /recipe-books/{bookId}/recipes)
+	GetRecipeBooksBookIdRecipes(w http.ResponseWriter, r *http.Request, bookId string)
+	// Create a new recipe in a recipe book
+	// (POST /recipe-books/{bookId}/recipes)
+	PostRecipeBooksBookIdRecipes(w http.ResponseWriter, r *http.Request, bookId string)
+	// Delete a specific recipe in a recipe book
+	// (DELETE /recipe-books/{bookId}/recipes/{recipeId})
+	DeleteRecipeBooksBookIdRecipesRecipeId(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	// Retrieve a specific recipe in a recipe book
+	// (GET /recipe-books/{bookId}/recipes/{recipeId})
+	GetRecipeBooksBookIdRecipesRecipeId(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	// Update a specific recipe in a recipe book
+	// (PUT /recipe-books/{bookId}/recipes/{recipeId})
+	PutRecipeBooksBookIdRecipesRecipeId(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	// Retrieve all direction steps in a recipe
+	// (GET /recipe-books/{bookId}/recipes/{recipeId}/direction-steps)
+	GetRecipeBooksBookIdRecipesRecipeIdDirectionSteps(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	// Create a new direction step in a recipe
+	// (POST /recipe-books/{bookId}/recipes/{recipeId}/direction-steps)
+	PostRecipeBooksBookIdRecipesRecipeIdDirectionSteps(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	// Retrieve a specific direction step in a recipe
+	// (GET /recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId})
+	GetRecipeBooksBookIdRecipesRecipeIdDirectionStepsStepId(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, stepId string)
+	// Update a specific direction step in a recipe
+	// (PUT /recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId})
+	PutRecipeBooksBookIdRecipesRecipeIdDirectionStepsStepId(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, stepId string)
+	// Retrieve all ingredients in a recipe
+	// (GET /recipe-books/{bookId}/recipes/{recipeId}/ingredients)
+	GetRecipeBooksBookIdRecipesRecipeIdIngredients(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	// Create a new ingredient in a recipe
+	// (POST /recipe-books/{bookId}/recipes/{recipeId}/ingredients)
+	PostRecipeBooksBookIdRecipesRecipeIdIngredients(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	// Delete a specific ingredient in a recipe
+	// (DELETE /recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId})
+	DeleteRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, ingredientId string)
+	// Retrieve a specific ingredient in a recipe
+	// (GET /recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId})
+	GetRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, ingredientId string)
+	// Update a specific ingredient in a recipe
+	// (PUT /recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId})
+	PutRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, ingredientId string)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -22,6 +81,669 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// GetRecipeBooks operation middleware
+func (siw *ServerInterfaceWrapper) GetRecipeBooks(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRecipeBooks(w, r)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PostRecipeBooks operation middleware
+func (siw *ServerInterfaceWrapper) PostRecipeBooks(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostRecipeBooks(w, r)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeleteRecipeBooksBookId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteRecipeBooksBookId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteRecipeBooksBookId(w, r, bookId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetRecipeBooksBookId operation middleware
+func (siw *ServerInterfaceWrapper) GetRecipeBooksBookId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRecipeBooksBookId(w, r, bookId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PutRecipeBooksBookId operation middleware
+func (siw *ServerInterfaceWrapper) PutRecipeBooksBookId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PutRecipeBooksBookId(w, r, bookId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetRecipeBooksBookIdRecipes operation middleware
+func (siw *ServerInterfaceWrapper) GetRecipeBooksBookIdRecipes(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRecipeBooksBookIdRecipes(w, r, bookId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PostRecipeBooksBookIdRecipes operation middleware
+func (siw *ServerInterfaceWrapper) PostRecipeBooksBookIdRecipes(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostRecipeBooksBookIdRecipes(w, r, bookId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeleteRecipeBooksBookIdRecipesRecipeId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteRecipeBooksBookIdRecipesRecipeId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteRecipeBooksBookIdRecipesRecipeId(w, r, bookId, recipeId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetRecipeBooksBookIdRecipesRecipeId operation middleware
+func (siw *ServerInterfaceWrapper) GetRecipeBooksBookIdRecipesRecipeId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRecipeBooksBookIdRecipesRecipeId(w, r, bookId, recipeId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PutRecipeBooksBookIdRecipesRecipeId operation middleware
+func (siw *ServerInterfaceWrapper) PutRecipeBooksBookIdRecipesRecipeId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PutRecipeBooksBookIdRecipesRecipeId(w, r, bookId, recipeId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetRecipeBooksBookIdRecipesRecipeIdDirectionSteps operation middleware
+func (siw *ServerInterfaceWrapper) GetRecipeBooksBookIdRecipesRecipeIdDirectionSteps(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRecipeBooksBookIdRecipesRecipeIdDirectionSteps(w, r, bookId, recipeId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PostRecipeBooksBookIdRecipesRecipeIdDirectionSteps operation middleware
+func (siw *ServerInterfaceWrapper) PostRecipeBooksBookIdRecipesRecipeIdDirectionSteps(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostRecipeBooksBookIdRecipesRecipeIdDirectionSteps(w, r, bookId, recipeId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetRecipeBooksBookIdRecipesRecipeIdDirectionStepsStepId operation middleware
+func (siw *ServerInterfaceWrapper) GetRecipeBooksBookIdRecipesRecipeIdDirectionStepsStepId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "stepId" -------------
+	var stepId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "stepId", runtime.ParamLocationPath, chi.URLParam(r, "stepId"), &stepId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "stepId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRecipeBooksBookIdRecipesRecipeIdDirectionStepsStepId(w, r, bookId, recipeId, stepId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PutRecipeBooksBookIdRecipesRecipeIdDirectionStepsStepId operation middleware
+func (siw *ServerInterfaceWrapper) PutRecipeBooksBookIdRecipesRecipeIdDirectionStepsStepId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "stepId" -------------
+	var stepId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "stepId", runtime.ParamLocationPath, chi.URLParam(r, "stepId"), &stepId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "stepId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PutRecipeBooksBookIdRecipesRecipeIdDirectionStepsStepId(w, r, bookId, recipeId, stepId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetRecipeBooksBookIdRecipesRecipeIdIngredients operation middleware
+func (siw *ServerInterfaceWrapper) GetRecipeBooksBookIdRecipesRecipeIdIngredients(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRecipeBooksBookIdRecipesRecipeIdIngredients(w, r, bookId, recipeId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PostRecipeBooksBookIdRecipesRecipeIdIngredients operation middleware
+func (siw *ServerInterfaceWrapper) PostRecipeBooksBookIdRecipesRecipeIdIngredients(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostRecipeBooksBookIdRecipesRecipeIdIngredients(w, r, bookId, recipeId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeleteRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "ingredientId" -------------
+	var ingredientId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "ingredientId", runtime.ParamLocationPath, chi.URLParam(r, "ingredientId"), &ingredientId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "ingredientId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId(w, r, bookId, recipeId, ingredientId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId operation middleware
+func (siw *ServerInterfaceWrapper) GetRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "ingredientId" -------------
+	var ingredientId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "ingredientId", runtime.ParamLocationPath, chi.URLParam(r, "ingredientId"), &ingredientId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "ingredientId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId(w, r, bookId, recipeId, ingredientId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PutRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId operation middleware
+func (siw *ServerInterfaceWrapper) PutRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "ingredientId" -------------
+	var ingredientId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "ingredientId", runtime.ParamLocationPath, chi.URLParam(r, "ingredientId"), &ingredientId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "ingredientId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PutRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId(w, r, bookId, recipeId, ingredientId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
 
 type UnescapedCookieParamError struct {
 	ParamName string
@@ -130,6 +852,69 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 	}
+	wrapper := ServerInterfaceWrapper{
+		Handler:            si,
+		HandlerMiddlewares: options.Middlewares,
+		ErrorHandlerFunc:   options.ErrorHandlerFunc,
+	}
+
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/recipe-books", wrapper.GetRecipeBooks)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/recipe-books", wrapper.PostRecipeBooks)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/recipe-books/{bookId}", wrapper.DeleteRecipeBooksBookId)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/recipe-books/{bookId}", wrapper.GetRecipeBooksBookId)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/recipe-books/{bookId}", wrapper.PutRecipeBooksBookId)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes", wrapper.GetRecipeBooksBookIdRecipes)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/recipe-books/{bookId}/recipes", wrapper.PostRecipeBooksBookIdRecipes)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}", wrapper.DeleteRecipeBooksBookIdRecipesRecipeId)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}", wrapper.GetRecipeBooksBookIdRecipesRecipeId)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}", wrapper.PutRecipeBooksBookIdRecipesRecipeId)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps", wrapper.GetRecipeBooksBookIdRecipesRecipeIdDirectionSteps)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps", wrapper.PostRecipeBooksBookIdRecipesRecipeIdDirectionSteps)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId}", wrapper.GetRecipeBooksBookIdRecipesRecipeIdDirectionStepsStepId)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId}", wrapper.PutRecipeBooksBookIdRecipesRecipeIdDirectionStepsStepId)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/ingredients", wrapper.GetRecipeBooksBookIdRecipesRecipeIdIngredients)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/ingredients", wrapper.PostRecipeBooksBookIdRecipesRecipeIdIngredients)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}", wrapper.DeleteRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}", wrapper.GetRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}", wrapper.PutRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId)
+	})
 
 	return r
 }
