@@ -67,7 +67,7 @@ func (app *App) Setup(ctx context.Context) error {
 
 	// HTTP Server
 	app.http = http2.NewServer(app.opts...)
-	app.SetSampleRoutes() // WIP: Remove later
+	app.EnableProbes()
 
 	// gRPC servers
 
@@ -107,13 +107,10 @@ func (app *App) EnableSupervisor() {
 	app.supervisor = sys.NewSupervisor(name, true, app.opts)
 }
 
-// SetSampleRoutes used only to test the server.
-// Using probes as sample routes for now.
-// Will be removed before rebasing main.
-func (app *App) SetSampleRoutes() {
-	probes := http2.NewRouter("probes", app.opts...)
-	probes.Mount("/", http2.Healthz)
-	app.http.Router().Mount("/healthz", probes)
+func (app *App) EnableProbes() {
+	health := http2.NewRouter("health", app.opts...)
+	health.Mount("/", http2.Healthz)
+	app.http.Router().Mount("/healthz", health)
 }
 
 func (app *App) RegisterHTTPHandler(http.Handler) {
