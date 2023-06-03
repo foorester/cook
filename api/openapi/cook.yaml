@@ -135,16 +135,16 @@ paths:
             type: string
         - in: path
           name: recipeId
-          required: null
-    schema:
-      type: string
-    responses:
-      '200':
-        description: Successful response
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Recipe'
+          required: true
+          schema:
+            type: string
+          responses:
+            '200':
+              description: Successful response
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Recipe'
     put:
       summary: Update a specific recipe in a recipe book
       parameters:
