@@ -21,6 +21,11 @@ While the generated code will be optimized for managing a small set of resources
 
 [To be completed]
 
+## Notes
+This projects utilizes a customized fork of the OpenAPI generator for its server and client interface needs. While the original version of the generator, available at https://github.com/deepmap/oapi-codegen, remains a viable option, we have opted to use the forked version for improved code clarity.
+
+One concrete example highlighting is the transformation of a server interface function originally named `DeleteRecipeBooksBookIdRecipesRecipeIdIngredientsIngredientId` into `DeleteIngredient`.
+
 ## License
 
 This project is licensed under the MIT License. Feel free to use and modify it as per the terms of the license.
