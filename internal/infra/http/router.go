@@ -8,8 +8,13 @@ import (
 
 type (
 	Router interface {
+		sys.Worker
 		chi.Router
-		//ServeHTTP(w http.ResponseWriter, r *http.Request)
+		Registerable
+	}
+
+	Registerable interface {
+		Register(r Registry, path string)
 	}
 
 	SimpleRouter struct {
@@ -23,4 +28,8 @@ func NewRouter(name string, opts ...sys.Option) Router {
 		Worker: sys.NewWorker(name, opts...),
 		Router: chi.NewRouter(),
 	}
+}
+
+func (sr *SimpleRouter) Register(r Registry, path string) {
+	r.RegisterRouter(path, sr)
 }
