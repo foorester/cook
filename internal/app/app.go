@@ -64,7 +64,8 @@ func (app *App) Setup(ctx context.Context) error {
 
 	// HTTP Server
 	app.http = http2.NewServer(app.opts...)
-	app.EnableProbes()
+	app.SetupRoutes(ctx)
+	app.SetupProbes(ctx)
 
 	// gRPC servers
 
@@ -80,12 +81,6 @@ func (app *App) Setup(ctx context.Context) error {
 func (app *App) Start(ctx context.Context) error {
 	app.Log().Infof("%s starting...", app.Name())
 	defer app.Log().Infof("%s stopped", app.Name())
-
-	err := app.http.Setup(ctx)
-	if err != nil {
-		err = errors.Wrap("app start error", err)
-		app.Log().Error(err.Error())
-	}
 
 	app.supervisor.AddTasks(
 		app.http.Start,
@@ -110,7 +105,12 @@ func (app *App) EnableSupervisor() {
 	app.supervisor = sys.NewSupervisor(name, true, app.opts)
 }
 
-func (app *App) EnableProbes() {
+func (app *App) SetupRoutes(ctx context.Context) {
+	app.http.Setup(ctx)
+}
+
+// SetupProbes WIP implementation
+func (app *App) SetupProbes(ctx context.Context) {
 	health := http2.NewRouter("health", app.opts...)
 	health.Mount("/", http2.Healthz)
 	app.http.Router().Mount("/healthz", health)

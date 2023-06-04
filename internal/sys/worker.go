@@ -16,6 +16,7 @@ type (
 		Name() string
 		Log() log.Logger
 		Cfg() *config.Config
+		Setup(ctx context.Context)
 		Start(ctx context.Context) error
 		Stop(ctx context.Context) error
 	}
@@ -67,6 +68,10 @@ func (bw *BaseWorker) Cfg() *config.Config {
 
 func (bw *BaseWorker) SetCfg(cfg *config.Config) {
 	bw.cfg = cfg
+}
+
+func (bw *BaseWorker) Setup(ctx context.Context) {
+	bw.Log().Infof("%s setup", bw.Name())
 }
 
 func (bw *BaseWorker) Start(ctx context.Context) error {
