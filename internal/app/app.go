@@ -3,10 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"sync"
-
-	"google.golang.org/grpc"
 
 	"github.com/foorester/cook/internal/core/service"
 	"github.com/foorester/cook/internal/infra/db/pg"
@@ -84,6 +81,12 @@ func (app *App) Start(ctx context.Context) error {
 	app.Log().Infof("%s starting...", app.Name())
 	defer app.Log().Infof("%s stopped", app.Name())
 
+	err := app.http.Setup(ctx)
+	if err != nil {
+		err = errors.Wrap("app start error", err)
+		app.Log().Error(err.Error())
+	}
+
 	app.supervisor.AddTasks(
 		app.http.Start,
 		//app.grpc.Start,
@@ -113,10 +116,8 @@ func (app *App) EnableProbes() {
 	app.http.Router().Mount("/healthz", health)
 }
 
-func (app *App) RegisterHTTPHandler(http.Handler) {
-	app.Log().Infof("No registered HTTP handlers for %s", app.Name())
-}
-
-func (app *App) RegisterGRPCServer(srv *grpc.Server) {
-	app.Log().Infof("No registered gRPC servers for %s", app.Name())
+func (app *App) RegisterRouter(path string, r http2.Router) {
+	app.Log().Infof("Registering '%s' router to handle '%s' routes", r.Name())
+	app.http.Router().Mount(path, r)
+	app.Log().Infof("'%s' registered", r.Name())
 }

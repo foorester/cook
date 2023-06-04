@@ -8,6 +8,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
+	"github.com/foorester/cook/internal/infra/openapi"
 	"github.com/foorester/cook/internal/sys"
 )
 
@@ -21,19 +22,21 @@ type (
 )
 
 var (
-	name = "http-server"
+	httpServerName = "http-server"
+	apiV1PAth      = "/api/v1"
 )
 
 func NewServer(opts ...sys.Option) (server *Server) {
 	return &Server{
-		Worker: sys.NewWorker(name, opts...),
+		Worker: sys.NewWorker(httpServerName, opts...),
 		opts:   opts,
 		router: NewRouter("root-router", opts...),
 	}
 }
 
 func (srv *Server) Setup(ctx context.Context) error {
-	//srv.Mount("/api", openapi.Handler(openAPIInterfaceImpl))
+	h := NewCookHandler(srv.opts...)
+	srv.router.Mount(apiV1PAth, openapi.Handler(h))
 	return nil
 }
 
