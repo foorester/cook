@@ -1,8 +1,6 @@
 package http
 
 import (
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 
 	"github.com/foorester/cook/internal/sys"
@@ -11,9 +9,7 @@ import (
 type (
 	Router interface {
 		chi.Router
-		Method(method, pattern string, handler http.Handler)
-		Mount(pattern string, handler http.Handler)
-		ServeHTTP(w http.ResponseWriter, r *http.Request)
+		//ServeHTTP(w http.ResponseWriter, r *http.Request)
 	}
 
 	SimpleRouter struct {
