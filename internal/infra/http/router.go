@@ -28,9 +28,3 @@ func NewRouter(name string, opts ...sys.Option) Router {
 		Router: chi.NewRouter(),
 	}
 }
-
-// Underlying - WIP: A temporary ugliness. Only until the router is fully implemented.
-// Will be removed before rebasing main.
-func (r *SimpleRouter) Underlying() chi.Router {
-	return r.Router
-}
