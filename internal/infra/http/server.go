@@ -34,10 +34,9 @@ func NewServer(opts ...sys.Option) (server *Server) {
 	}
 }
 
-func (srv *Server) Setup(ctx context.Context) error {
+func (srv *Server) Setup(ctx context.Context) {
 	h := NewCookHandler(srv.opts...)
 	srv.router.Mount(apiV1PAth, openapi.Handler(h))
-	return nil
 }
 
 func (srv *Server) Start(ctx context.Context) error {
