@@ -15,7 +15,7 @@ import (
 
 type (
 	RecipeRepo struct {
-		sys.Worker
+		*sys.BaseWorker
 		db db.DB
 	}
 )
@@ -26,8 +26,8 @@ const (
 
 func NewRecipeRepo(db db.DB, opts ...sys.Option) *RecipeRepo {
 	return &RecipeRepo{
-		Worker: sys.NewWorker(name, opts...),
-		db:     db,
+		BaseWorker: sys.NewWorker(name, opts...),
+		db:         db,
 	}
 }
 
@@ -41,14 +41,28 @@ func (rr *RecipeRepo) Start(ctx context.Context) error {
 	return nil
 }
 
-func (rr *RecipeRepo) DB() *sqlx.DB {
+func (rr *RecipeRepo) DB() (db any) {
 	return rr.db.DB()
+}
+
+func (rr *RecipeRepo) PgDB() (db *sqlx.DB, ok bool) {
+	db, ok = rr.DB().(*sqlx.DB)
+	if !ok {
+		return db, false
+	}
+
+	return db, true
 }
 
 func (rr *RecipeRepo) Save(ctx context.Context, r model.Recipe) (err error) {
 	recipes := []model.Recipe{r}
 
-	_, err = rr.DB().NamedExec(`INSERT INTO recipes (id, name) VALUES (:id, :name)`, recipes)
+	db, ok := rr.PgDB()
+	if !ok {
+		return NoConnectionError
+	}
+
+	_, err = db.NamedExec(`INSERT INTO recipes (id, name) VALUES (:id, :name)`, recipes)
 
 	if err != nil {
 		return errors.Wrap("save recipe error", err)

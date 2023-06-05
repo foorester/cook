@@ -6,6 +6,10 @@ type (
 	}
 )
 
+var (
+	NotImplementedError = NewError("not implemented")
+)
+
 func NewError(msg string) Err {
 	return Err{msg}
 }
