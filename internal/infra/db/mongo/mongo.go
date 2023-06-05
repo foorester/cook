@@ -1,10 +1,12 @@
-package pg
+package mongo
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/errors"
@@ -13,18 +15,19 @@ import (
 type (
 	DB struct {
 		sys.Worker
-		db *sqlx.DB
+		client *mongo.Client
+		db     *mongo.Database
 	}
 )
 
 const (
-	name = "pg-db"
+	name = "mongo-db"
 )
 
 func NewDB(opts ...sys.Option) *DB {
 	return &DB{
 		Worker: sys.NewWorker(name, opts...),
-		db:     nil,
+		client: nil,
 	}
 }
 
@@ -32,18 +35,22 @@ func (db *DB) Start(ctx context.Context) error {
 	return db.Connect()
 }
 
-func (db *DB) Connect() error {
-	pgdb, err := sqlx.Open("postgres", db.connString())
+func (db *DB) Connect() (err error) {
+	connString := db.connString()
+	db.client, err = mongo.NewClient(options.Client().ApplyURI(connString))
 	if err != nil {
-		msg := fmt.Sprintf("%s connection error", db.Name())
-		return errors.Wrap(msg, err)
+		return errors.Wrap("MongoDB connect client error", err)
 	}
 
-	err = pgdb.Ping()
+	ctx := context.TODO()
+
+	err = db.client.Connect(ctx)
 	if err != nil {
-		msg := fmt.Sprintf("%s ping connection error", db.Name())
-		return errors.Wrap(msg, err)
+		return errors.Wrap("MongoDB connect error", err)
 	}
+
+	dbName := db.Cfg().GetString("store.write.db.db")
+	db.db = db.client.Database(dbName)
 
 	db.Log().Infof("%s database connected!", db.Name())
 	return nil
@@ -53,6 +60,15 @@ func (db *DB) DB() any {
 	return db.db
 }
 
+func (db *DB) mongoDB() (sqlDB *sqlx.DB, ok bool) {
+	sqlDB, ok = db.DB().(*sqlx.DB)
+	if !ok {
+		return sqlDB, false
+	}
+
+	return sqlDB, true
+}
+
 func (db *DB) connString() (connString string) {
 	cfg := db.Cfg()
 	user := cfg.GetString("store.write.db.user")
@@ -60,5 +76,5 @@ func (db *DB) connString() (connString string) {
 	name := cfg.GetString("store.write.db.db")
 	host := cfg.GetString("store.write.db.host")
 	port := cfg.GetInt("store.write.db.port")
-	return fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=require", user, pass, name, host, port)
+	return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", user, pass, host, port, name)
 }

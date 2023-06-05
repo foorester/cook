@@ -21,6 +21,13 @@ While the generated code will be optimized for managing a small set of resources
 
 [To be completed]
 
+## Highlighted files
+### HTTP handlers
+* [http/handler.go](internal/infra/http/handler.go)
+
+### Business logic
+* [service/recipe.go](internal/core/service/recipe.go)
+
 ## Notes
 This projects utilizes a customized fork of the OpenAPI generator for its server and client interface needs. While the original version of the generator, available at https://github.com/deepmap/oapi-codegen, remains a viable option, we have opted to use [this forked version](https://github.com/foorester/oapi-codegen) for improved code clarity.
 

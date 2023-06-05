@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/jmoiron/sqlx"
+	"context"
 
 	"github.com/foorester/cook/internal/sys"
 )
@@ -9,6 +9,19 @@ import (
 type (
 	DB interface {
 		sys.Worker
-		DB() *sqlx.DB
+		// DB - NOTE: See if there is a common set of features that can define what is returned by
+		// this function. For the moment it will return any (interface{}).
+		// Not ideal, forces type assertion when using specific implementation.
+		DB() any
+		Tx
+	}
+
+	Tx interface {
+		Begin(ctx context.Context) (TxContext, error)
+	}
+
+	TxContext interface {
+		Commit(ctx context.Context) error
+		Rollback(ctx context.Context) error
 	}
 )

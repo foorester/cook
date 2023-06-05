@@ -13,3 +13,7 @@ func NewError(msg string) HTTPError {
 		Err: errors.NewError(msg),
 	}
 }
+
+var (
+	InvalidJSONBodyErr = NewError("invalid JSON body")
+)

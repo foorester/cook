@@ -14,7 +14,7 @@ type (
 		Debugf(format string, v ...interface{})
 		Info(msg string)
 		Infof(format string, v ...interface{})
-		Error(msg string)
+		Error(err error)
 		Errorf(format string, v ...interface{})
 		Fatal(err error)
 	}
@@ -120,8 +120,8 @@ func (sl *SimpleLogger) Infof(format string, v ...interface{}) {
 }
 
 // Error calls l.Output to print to the logger.
-func (sl *SimpleLogger) Error(msg string) {
-	sl.error.Println(msg)
+func (sl *SimpleLogger) Error(err error) {
+	sl.error.Println(err.Error())
 }
 
 // Errorf calls l.Output to print to the logger.
