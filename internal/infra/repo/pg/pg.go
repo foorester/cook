@@ -54,7 +54,25 @@ func (rr *RecipeRepo) PgDB() (db *sqlx.DB, ok bool) {
 	return db, true
 }
 
-func (rr *RecipeRepo) Save(ctx context.Context, r model.Recipe) (err error) {
+func (rr *RecipeRepo) CreateBook(ctx context.Context, r model.Book) (err error) {
+	books := []model.Book{r}
+
+	db, ok := rr.PgDB()
+	if !ok {
+		return NoConnectionError
+	}
+
+	// TODO: Update SQL Statement, there is a better way to do this insertion
+	_, err = db.NamedExec(`INSERT INTO books (id, name, description) VALUES (:id, :name, :description)`, books)
+
+	if err != nil {
+		return errors.Wrap("save recipe book error", err)
+	}
+
+	return nil
+}
+
+func (rr *RecipeRepo) CreateRecipe(ctx context.Context, r model.Recipe) (err error) {
 	recipes := []model.Recipe{r}
 
 	db, ok := rr.PgDB()
@@ -62,6 +80,7 @@ func (rr *RecipeRepo) Save(ctx context.Context, r model.Recipe) (err error) {
 		return NoConnectionError
 	}
 
+	// TODO: Update SQL Statement, there is a better way to do this insertion
 	_, err = db.NamedExec(`INSERT INTO recipes (id, name) VALUES (:id, :name)`, recipes)
 
 	if err != nil {

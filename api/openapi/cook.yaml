@@ -332,7 +332,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DirectionStepList'
+                $ref: '#/components/schemas/StepList'
     post:
       summary: Create a new direction step in a recipe
       parameters:
@@ -351,14 +351,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DirectionStep'
+              $ref: '#/components/schemas/Step'
       responses:
         '201':
           description: Direction step created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DirectionStep'
+                $ref: '#/components/schemas/Step'
   /recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId}:
     get:
       summary: Retrieve a specific direction step in a recipe
@@ -384,7 +384,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DirectionStep'
+                $ref: '#/components/schemas/Step'
     put:
       summary: Update a specific direction step in a recipe
       parameters:
@@ -408,14 +408,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DirectionStep'
+              $ref: '#/components/schemas/Step'
       responses:
         '200':
           description: Direction Step updated
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DirectionStep'
+              $ref: '#/components/schemas/Step'
         delete:
           summary: Delete a specific direction step in a recipe
           parameters:
@@ -460,7 +460,7 @@ components:
         directionSteps:
           type: array
           items:
-            $ref: '#/components/schemas/DirectionStep'
+            $ref: '#/components/schemas/Step'
     Ingredient:
       type: object
       properties:
@@ -470,7 +470,7 @@ components:
           type: string
         quantity:
           type: string
-    DirectionStep:
+    Step:
       type: object
       properties:
         id:
@@ -489,7 +489,7 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Ingredient'
-    DirectionStepList:
+    StepList:
       type: array
       items:
-        $ref: '#/components/schemas/DirectionStep'
+        $ref: '#/components/schemas/Step'

@@ -2,7 +2,8 @@ package model
 
 type (
 	Book struct {
-		Id   string
-		Name string
+		ID          string
+		Name        string
+		Description string
 	}
 )

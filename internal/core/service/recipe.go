@@ -13,13 +13,14 @@ import (
 type (
 	RecipeService interface {
 		sys.Worker
-		Repo() port.RecipeRepo
-		SaveRecipe(ctx context.Context, r model.Recipe) error
+		Repo() port.CookRepo
+		CreateBook(ctx context.Context, r model.Book) error
+		CreateRecipe(ctx context.Context, r model.Recipe) error
 	}
 
 	Recipe struct {
 		*sys.BaseWorker
-		repo   port.RecipeRepo
+		repo   port.CookRepo
 		mailer port.Mailer
 	}
 )
@@ -28,7 +29,7 @@ const (
 	name = "repo-service"
 )
 
-func NewService(rr port.RecipeRepo, opts ...sys.Option) *Recipe {
+func NewService(rr port.CookRepo, opts ...sys.Option) *Recipe {
 	return &Recipe{
 		BaseWorker: sys.NewWorker(name, opts...),
 		repo:       rr,
@@ -36,28 +37,50 @@ func NewService(rr port.RecipeRepo, opts ...sys.Option) *Recipe {
 	}
 }
 
-func (rs *Recipe) SaveRecipe(ctx context.Context, req SaveRecipeReq) (errSet core.ValErrorSet, err error) {
+func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq) (errSet core.ValErrorSet, err error) {
 	// Transport to Model
-	recipe := req.ToRecipe()
+	book := req.ToBook()
 
 	// Validate model
-	v := NewRecipeValidator(recipe)
+	v := NewBookValidator(book)
 
-	err = v.ValidateForSave()
+	err = v.ValidateForCreate()
 	if err != nil {
 		return v.Errors, err
 	}
 
 	// Persist it
-	err = rs.Repo().Save(ctx, recipe)
+	err = rs.Repo().CreateBook(ctx, book)
 	if err != nil {
-		return errSet, errors.Wrap("error saving recipe", err)
+		return errSet, errors.Wrap("error creating recipe book", err)
 	}
 
 	// Send a message to bus
 	return errSet, nil
 }
 
-func (rs *Recipe) Repo() port.RecipeRepo {
+func (rs *Recipe) CreateRecipe(ctx context.Context, req CreateRecipeReq) (errSet core.ValErrorSet, err error) {
+	// Transport to Model
+	recipe := req.ToRecipe()
+
+	// Validate model
+	v := NewRecipeValidator(recipe)
+
+	err = v.ValidateForCreate()
+	if err != nil {
+		return v.Errors, err
+	}
+
+	// Persist it
+	err = rs.Repo().CreateRecipe(ctx, recipe)
+	if err != nil {
+		return errSet, errors.Wrap("error creating recipe", err)
+	}
+
+	// Send a message to bus
+	return errSet, nil
+}
+
+func (rs *Recipe) Repo() port.CookRepo {
 	return rs.repo
 }

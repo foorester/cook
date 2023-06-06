@@ -21,10 +21,10 @@ func NewBookValidator(m model.Book) BookValidator {
 	}
 }
 
-func (v BookValidator) ValidateForSave() error {
+func (v BookValidator) ValidateForCreate() error {
 	// Username
 	ok0 := v.ValidateRequiredName()
-	ok1 := v.ValidateMinLengthName(4)
+	ok1 := v.ValidateMinLengthName(2)
 
 	if ok0 && ok1 {
 		return nil
@@ -102,7 +102,7 @@ func NewRecipeValidator(m model.Recipe) RecipeValidator {
 	}
 }
 
-func (v RecipeValidator) ValidateForSave() error {
+func (v RecipeValidator) ValidateForCreate() error {
 	ok0 := v.ValidateRequiredName()
 	ok1 := v.ValidateMinLengthName(4)
 

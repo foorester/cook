@@ -546,7 +546,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DirectionStepList"
+                  "$ref": "#/components/schemas/StepList"
                 }
               }
             }
@@ -578,7 +578,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DirectionStep"
+                "$ref": "#/components/schemas/Step"
               }
             }
           }
@@ -589,7 +589,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DirectionStep"
+                  "$ref": "#/components/schemas/Step"
                 }
               }
             }
@@ -632,7 +632,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DirectionStep"
+                  "$ref": "#/components/schemas/Step"
                 }
               }
             }
@@ -672,7 +672,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DirectionStep"
+                "$ref": "#/components/schemas/Step"
               }
             }
           }
@@ -684,7 +684,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DirectionStep"
+                "$ref": "#/components/schemas/Step"
               }
             }
           },
@@ -757,7 +757,7 @@
           "directionSteps": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DirectionStep"
+              "$ref": "#/components/schemas/Step"
             }
           }
         }
@@ -776,7 +776,7 @@
           }
         }
       },
-      "DirectionStep": {
+      "Step": {
         "type": "object",
         "properties": {
           "id": {
@@ -805,10 +805,10 @@
           "$ref": "#/components/schemas/Ingredient"
         }
       },
-      "DirectionStepList": {
+      "StepList": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/DirectionStep"
+          "$ref": "#/components/schemas/Step"
         }
       }
     }
