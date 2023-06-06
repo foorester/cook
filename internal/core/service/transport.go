@@ -14,15 +14,24 @@ type (
 // GetBooksReq validation logic
 
 type (
-	SaveBookReq struct {
-		ID   string
-		Name string
+	CreateBookReq struct {
+		ID          string
+		Name        string
+		Description string
 	}
 
-	SaveBookRes struct{}
+	CreateBookRes struct{}
 )
 
-// SaveBookReq validation logic
+func (req CreateBookReq) ToBook() model.Book {
+	return model.Book{
+		ID:          req.ID,
+		Name:        req.Name,
+		Description: req.Description,
+	}
+}
+
+// CreateBookReq validation logic
 
 type (
 	DeleteBookReq struct {
@@ -72,22 +81,22 @@ type (
 // GetBookReq validation logic
 
 type (
-	SaveRecipeReq struct {
+	CreateRecipeReq struct {
 		ID   string
 		Name string
 	}
 
-	SaveRecipeRes struct{}
+	CreateRecipeRes struct{}
 )
 
-func (req SaveRecipeReq) ToRecipe() model.Recipe {
+func (req CreateRecipeReq) ToRecipe() model.Recipe {
 	return model.Recipe{
 		ID:   req.ID,
 		Name: req.Name,
 	}
 }
 
-// SaveRecipeReq validation logic
+// CreateRecipeReq validation logic
 
 type (
 	DeleteRecipeReq struct {
@@ -139,16 +148,16 @@ type (
 // GetDirectionStepsReq validation logic
 
 type (
-	SaveDirectionStepReq struct {
+	CreateDirectionStepReq struct {
 		Name        string
 		Description string
 		Duration    string
 	}
 
-	SaveDirectionStepRes struct{}
+	CreateDirectionStepRes struct{}
 )
 
-// SaveDirectionStepReq validation logic
+// CreateDirectionStepReq validation logic
 
 type (
 	GetDirectionStepReq struct {
@@ -191,17 +200,17 @@ type (
 // GetIngredientsReq validation logic
 
 type (
-	SaveIngredientReq struct {
+	CreateIngredientReq struct {
 		Name        string
 		Description string
 		Quantity    string
 		Unit        string
 	}
 
-	SaveIngredientRes struct{}
+	CreateIngredientRes struct{}
 )
 
-// SaveIngredientReq validation logic
+// CreateIngredientReq validation logic
 
 type (
 	DeleteIngredientReq struct {

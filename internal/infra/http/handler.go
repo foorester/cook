@@ -109,7 +109,7 @@ func (h *CookHandler) PostRecipe(w http.ResponseWriter, r *http.Request, bookId 
 
 	// Use service to save the model
 	ctx := r.Context()
-	err = h.Service().SaveRecipe(ctx, recipe)
+	err = h.Service().CreateRecipe(ctx, recipe)
 	if err != nil {
 
 	}
@@ -139,17 +139,17 @@ func (h *CookHandler) PutRecipe(w http.ResponseWriter, r *http.Request, bookId s
 	}
 }
 
-func (h *CookHandler) GetDirectionSteps(w http.ResponseWriter, r *http.Request, bookId string, recipeId string) {
+func (h *CookHandler) GetSteps(w http.ResponseWriter, r *http.Request, bookId string, recipeId string) {
 	//TODO not implemented yet
-	_, err := w.Write([]byte("GetDirectionSteps not implemented yet"))
+	_, err := w.Write([]byte("GetSteps not implemented yet"))
 	if err != nil {
 		h.Log().Error(err)
 	}
 }
 
-func (h *CookHandler) PostDirectionStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string) {
+func (h *CookHandler) PostStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string) {
 	//TODO not implemented yet
-	_, err := w.Write([]byte("PostDirectionStep not implemented yet"))
+	_, err := w.Write([]byte("PostStep not implemented yet"))
 	if err != nil {
 		h.Log().Error(err)
 	}

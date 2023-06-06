@@ -32,6 +32,7 @@ func init() {
 }
 
 func NewService(name string, opts ...Option) *BaseService {
+	name = WithSuffix(name, 8)
 	return &BaseService{
 		BaseWorker: NewWorker(name, opts...),
 	}
