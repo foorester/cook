@@ -35,8 +35,11 @@ func NewService(rr port.RecipeRepo, opts ...sys.Option) *Recipe {
 	}
 }
 
-func (rs *Recipe) SaveRecipe(ctx context.Context, r model.Recipe) error {
+func (rs *Recipe) SaveRecipe(ctx context.Context, req SaveRecipeReq) error {
 	// Validate model
+
+	// Transport to Model
+	r := req.ToRecipe()
 
 	// Persist it
 	err := rs.Repo().Save(ctx, r)
