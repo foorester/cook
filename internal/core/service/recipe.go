@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/foorester/cook/internal/core"
 	"github.com/foorester/cook/internal/core/model"
 	"github.com/foorester/cook/internal/core/port"
 	"github.com/foorester/cook/internal/sys"
@@ -35,20 +36,26 @@ func NewService(rr port.RecipeRepo, opts ...sys.Option) *Recipe {
 	}
 }
 
-func (rs *Recipe) SaveRecipe(ctx context.Context, req SaveRecipeReq) error {
-	// Validate model
-
+func (rs *Recipe) SaveRecipe(ctx context.Context, req SaveRecipeReq) (errSet core.ValErrorSet, err error) {
 	// Transport to Model
-	r := req.ToRecipe()
+	recipe := req.ToRecipe()
+
+	// Validate model
+	v := NewRecipeValidator(recipe)
+
+	err = v.ValidateForSave()
+	if err != nil {
+		return v.Errors, err
+	}
 
 	// Persist it
-	err := rs.Repo().Save(ctx, r)
+	err = rs.Repo().Save(ctx, recipe)
 	if err != nil {
-		return errors.Wrap("error saving recipe", err)
+		return errSet, errors.Wrap("error saving recipe", err)
 	}
 
 	// Send a message to bus
-	return nil
+	return errSet, nil
 }
 
 func (rs *Recipe) Repo() port.RecipeRepo {
