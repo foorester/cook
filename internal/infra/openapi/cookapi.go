@@ -17,7 +17,7 @@ type ServerInterface interface {
 	// Retrieve all recipe books
 	// (GET /recipe-books)
 	GetRecipeBooks(w http.ResponseWriter, r *http.Request)
-	// Create a new recipe book
+	// CreateRecipe a new recipe book
 	// (POST /recipe-books)
 	PostRecipeBook(w http.ResponseWriter, r *http.Request)
 	// Delete a specific recipe book
@@ -32,7 +32,7 @@ type ServerInterface interface {
 	// Retrieve all recipes in a recipe book
 	// (GET /recipe-books/{bookId}/recipes)
 	GetRecipes(w http.ResponseWriter, r *http.Request, bookId string)
-	// Create a new recipe in a recipe book
+	// CreateRecipe a new recipe in a recipe book
 	// (POST /recipe-books/{bookId}/recipes)
 	PostRecipe(w http.ResponseWriter, r *http.Request, bookId string)
 	// Delete a specific recipe in a recipe book
@@ -46,10 +46,10 @@ type ServerInterface interface {
 	PutRecipe(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
 	// Retrieve all direction steps in a recipe
 	// (GET /recipe-books/{bookId}/recipes/{recipeId}/direction-steps)
-	GetDirectionSteps(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
-	// Create a new direction step in a recipe
+	GetSteps(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	// CreateRecipe a new direction step in a recipe
 	// (POST /recipe-books/{bookId}/recipes/{recipeId}/direction-steps)
-	PostDirectionStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	PostStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
 	// Retrieve a specific direction step in a recipe
 	// (GET /recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId})
 	GetStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, stepId string)
@@ -59,7 +59,7 @@ type ServerInterface interface {
 	// Retrieve all ingredients in a recipe
 	// (GET /recipe-books/{bookId}/recipes/{recipeId}/ingredients)
 	GetIngredients(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
-	// Create a new ingredient in a recipe
+	// CreateRecipe a new ingredient in a recipe
 	// (POST /recipe-books/{bookId}/recipes/{recipeId}/ingredients)
 	PostIngredient(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
 	// Delete a specific ingredient in a recipe
@@ -173,7 +173,7 @@ func (siw *ServerInterfaceWrapper) GetBook(w http.ResponseWriter, r *http.Reques
 }
 
 // PutBook operation middleware
-func (siw *ServerInterfaceWrapper) PutBook(w http.ResponseWriter, r *http.Request) {
+func (siw *	ServerInterfaceWrapper) PutBook(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var err error
@@ -367,8 +367,8 @@ func (siw *ServerInterfaceWrapper) PutRecipe(w http.ResponseWriter, r *http.Requ
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
-// GetDirectionSteps operation middleware
-func (siw *ServerInterfaceWrapper) GetDirectionSteps(w http.ResponseWriter, r *http.Request) {
+// GetSteps operation middleware
+func (siw *ServerInterfaceWrapper) GetSteps(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var err error
@@ -394,7 +394,7 @@ func (siw *ServerInterfaceWrapper) GetDirectionSteps(w http.ResponseWriter, r *h
 	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
 
 	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetDirectionSteps(w, r, bookId, recipeId)
+		siw.Handler.GetSteps(w, r, bookId, recipeId)
 	})
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -404,8 +404,8 @@ func (siw *ServerInterfaceWrapper) GetDirectionSteps(w http.ResponseWriter, r *h
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
-// PostDirectionStep operation middleware
-func (siw *ServerInterfaceWrapper) PostDirectionStep(w http.ResponseWriter, r *http.Request) {
+// PostStep operation middleware
+func (siw *ServerInterfaceWrapper) PostStep(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var err error
@@ -431,7 +431,7 @@ func (siw *ServerInterfaceWrapper) PostDirectionStep(w http.ResponseWriter, r *h
 	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
 
 	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PostDirectionStep(w, r, bookId, recipeId)
+		siw.Handler.PostStep(w, r, bookId, recipeId)
 	})
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -889,10 +889,10 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Put(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}", wrapper.PutRecipe)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps", wrapper.GetDirectionSteps)
+		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps", wrapper.GetSteps)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps", wrapper.PostDirectionStep)
+		r.Post(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps", wrapper.PostStep)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId}", wrapper.GetStep)

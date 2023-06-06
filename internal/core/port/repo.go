@@ -12,8 +12,9 @@ type (
 		Tx(ctx context.Context) (tx db.Tx, err error)
 	}
 
-	RecipeRepo interface {
+	CookRepo interface {
 		Repo
-		Save(ctx context.Context, recipe model.Recipe) error
+		CreateBook(ctx context.Context, recipe model.Book) error
+		CreateRecipe(ctx context.Context, recipe model.Recipe) error
 	}
 )
