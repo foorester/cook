@@ -3,8 +3,6 @@ package log_test
 import (
 	"bytes"
 	"io"
-	stdlog "log"
-	"os"
 	"testing"
 
 	"github.com/foorester/cook/internal/sys/log"
@@ -17,10 +15,18 @@ type MockLogger struct {
 	error *bytes.Buffer
 }
 
-func TestSimpleLoggerDebug(t *testing.T) {
-	output := NewMockOutput()
+func NewMockLogger() *MockLogger {
+	return &MockLogger{
+		debug: new(bytes.Buffer),
+		info:  new(bytes.Buffer),
+		error: new(bytes.Buffer),
+	}
+}
 
-	sl := log.NewLogger("debug", false)
+func TestSimpleLoggerDebug(t *testing.T) {
+	output := NewMockLogger()
+
+	sl := log.NewLogger("debug")
 	sl.SetDebugOutput(output.debug)
 
 	sl.Debug("debug message")
@@ -31,10 +37,24 @@ func TestSimpleLoggerDebug(t *testing.T) {
 	}
 }
 
-func TestSimpleLoggerInfo(t *testing.T) {
-	output := NewMockOutput()
+func TestSimpleLoggerDebugf(t *testing.T) {
+	output := NewMockLogger()
 
-	sl := log.NewLogger("info", false)
+	sl := log.NewLogger("debug")
+	sl.SetDebugOutput(output.debug)
+
+	sl.Debugf("debug message with value: %d", 42)
+	expectedOutput := "debug message with value: 42\n"
+	actualOutput := output.debug.String()
+	if actualOutput != expectedOutput {
+		t.Errorf("Expected debugf output:\n%s\nBut got:\n%s", expectedOutput, actualOutput)
+	}
+}
+
+func TestSimpleLoggerInfo(t *testing.T) {
+	output := NewMockLogger()
+
+	sl := log.NewLogger("info")
 	sl.SetInfoOutput(output.info)
 
 	sl.Info("info message")
@@ -45,36 +65,63 @@ func TestSimpleLoggerInfo(t *testing.T) {
 	}
 }
 
-func TestSimpleLoggerError(t *testing.T) {
-	output := NewMockOutput()
+func TestSimpleLoggerInfof(t *testing.T) {
+	output := NewMockLogger()
 
-	sl := log.NewLogger("error", false)
-	sl.SetInfoOutput(output.error)
+	sl := log.NewLogger("info")
+	sl.SetInfoOutput(output.info)
 
-	sl.Info("error message")
-	expectedOutput := "error message\n"
-	actualOutput := output.error.String()
+	sl.Infof("info message with value: %d", 42)
+	expectedOutput := "info message with value: 42\n"
+	actualOutput := output.info.String()
 	if actualOutput != expectedOutput {
-		t.Errorf("Expected info output:\n%s\nBut got:\n%s", expectedOutput, actualOutput)
+		t.Errorf("Expected infof output:\n%s\nBut got:\n%s", expectedOutput, actualOutput)
 	}
 }
 
-func TestMain(m *testing.M) {
-	// Redirect log output to io.Discard during tests
-	stdlog.SetOutput(io.Discard)
+func TestSimpleLoggerError(t *testing.T) {
+	output := NewMockLogger()
 
-	// Run the tests
-	exitCode := m.Run()
+	sl := log.NewLogger("error")
+	sl.SetErrorOutput(output.error)
 
-	// Clean up any resources if required
-
-	os.Exit(exitCode)
+	sl.Error("error message")
+	expectedOutput := "error message\n"
+	actualOutput := output.error.String()
+	if actualOutput != expectedOutput {
+		t.Errorf("Expected error output:\n%s\nBut got:\n%s", expectedOutput, actualOutput)
+	}
 }
 
-func NewMockOutput() *MockLogger {
-	return &MockLogger{
-		debug: &bytes.Buffer{},
-		info:  &bytes.Buffer{},
-		error: &bytes.Buffer{},
+func TestSimpleLoggerErrorf(t *testing.T) {
+	output := NewMockLogger()
+
+	sl := log.NewLogger("error")
+	sl.SetErrorOutput(output.error)
+
+	sl.Errorf("error message with value: %d", 42)
+	expectedOutput := "error message with value: 42\n"
+	actualOutput := output.error.String()
+	if actualOutput != expectedOutput {
+		t.Errorf("Expected errorf output:\n%s\nBut got:\n%s", expectedOutput, actualOutput)
+	}
+}
+
+func (m *MockLogger) Write(p []byte) (n int, err error) {
+	// Not needed for testing
+	return 0, nil
+}
+
+func (m *MockLogger) SetOutput(out io.Writer) {
+	// Redirect the output to the respective buffers
+	m.debug.Reset()
+	m.info.Reset()
+	m.error.Reset()
+
+	if output, ok := out.(*bytes.Buffer); ok {
+		// If the provided output is a bytes.Buffer, copy its contents to the respective buffers
+		m.debug.Write(output.Bytes())
+		m.info.Write(output.Bytes())
+		m.error.Write(output.Bytes())
 	}
 }

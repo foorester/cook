@@ -2,157 +2,119 @@ package log
 
 import (
 	"bytes"
-	"io"
+	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
-type (
-	Logger interface {
-		SetLevel(level string)
-		Debug(msg string)
-		Debugf(format string, v ...interface{})
-		Info(msg string)
-		Infof(format string, v ...interface{})
-		Error(err error)
-		Errorf(format string, v ...interface{})
-		Fatal(err error)
-	}
+type LogLevel int
 
-	SimpleLogger struct {
-		level string
-		flag  int
-		debug *log.Logger
-		info  *log.Logger
-		error *log.Logger
-	}
-
-	logLevel struct {
-		Debug string
-		Info  string
-		Error string
-	}
+const (
+	Error LogLevel = iota
+	Info
+	Debug
 )
 
-var (
-	Level = logLevel{
-		Debug: "debug",
-		Info:  "info",
-		Error: "error",
-	}
-)
-
-// NewLogger return a new logger.
-func NewLogger(level string, isFlag bool) *SimpleLogger {
-	flag := 0
-	if isFlag {
-		flag = log.Ldate | log.Ltime | log.Lmicroseconds //| adr.Lshortfile
-	}
-
-	return newLogger(level, flag)
+type Logger interface {
+	SetLogLevel(level LogLevel)
+	Debug(v ...any)
+	Debugf(format string, a ...any)
+	Info(v ...any)
+	Infof(format string, a ...any)
+	Error(v ...any)
+	Errorf(format string, a ...any)
 }
 
-// SetLevel sets the logging level preference
-func newLogger(level string, flag int) *SimpleLogger {
+type SimpleLogger struct {
+	debugLogger *log.Logger
+	infoLogger  *log.Logger
+	errorLogger *log.Logger
+	logLevel    LogLevel
+}
+
+func NewLogger(logLevel string) *SimpleLogger {
+	level := toValidLevel(logLevel)
+	return &SimpleLogger{
+		debugLogger: log.New(os.Stdout, "[DBG] ", log.LstdFlags),
+		infoLogger:  log.New(os.Stdout, "[INF] ", log.LstdFlags),
+		errorLogger: log.New(os.Stderr, "[ERR] ", log.LstdFlags),
+		logLevel:    level,
+	}
+}
+
+func (l *SimpleLogger) SetLogLevel(level LogLevel) {
+	l.logLevel = level
+}
+
+func (l *SimpleLogger) Debug(v ...any) {
+	if l.logLevel <= Debug {
+		l.debugLogger.Println(v...)
+	}
+}
+
+func (l *SimpleLogger) Debugf(format string, a ...any) {
+	if l.logLevel <= Debug {
+		message := fmt.Sprintf(format, a...)
+		l.debugLogger.Println(message)
+	}
+}
+
+func (l *SimpleLogger) Info(v ...any) {
+	if l.logLevel <= Info {
+		l.infoLogger.Println(v...)
+	}
+}
+
+func (l *SimpleLogger) Infof(format string, a ...any) {
+	if l.logLevel <= Info {
+		message := fmt.Sprintf(format, a...)
+		l.infoLogger.Println(message)
+	}
+}
+
+func (l *SimpleLogger) Error(v ...any) {
+	if l.logLevel <= Error {
+		l.errorLogger.Println(v...)
+	}
+}
+
+func (l *SimpleLogger) Errorf(format string, a ...any) {
+	if l.logLevel <= Error {
+		message := fmt.Sprintf(format, a...)
+		l.errorLogger.Println(message)
+	}
+}
+
+func toValidLevel(level string) LogLevel {
+	level = strings.ToLower(level)
+
 	switch level {
-	case Level.Debug:
-		return &SimpleLogger{
-			level: Level.Debug,
-			flag:  flag,
-			debug: log.New(os.Stderr, "[DBG] ", flag),
-			info:  log.New(os.Stderr, "[INF] ", flag),
-			error: log.New(os.Stderr, "[ERR] ", flag),
-		}
-
-	case Level.Info:
-		return &SimpleLogger{
-			level: Level.Info,
-			flag:  flag,
-			debug: log.New(io.Discard, "[DBG] ", flag),
-			info:  log.New(os.Stderr, "[INF] ", flag),
-			error: log.New(os.Stderr, "[ERR] ", flag),
-		}
-
-	case Level.Error:
-		return &SimpleLogger{
-			level: Level.Info,
-			flag:  flag,
-			debug: log.New(io.Discard, "DEBUG: ", flag),
-			info:  log.New(io.Discard, "INFO: ", flag),
-			error: log.New(os.Stderr, "ERROR: ", flag),
-		}
-
+	case "debug", "dbg":
+		return Debug
+	case "info", "inf":
+		return Info
+	case "error", "err":
+		return Error
 	default:
-		return &SimpleLogger{
-			level: Level.Info,
-			flag:  flag,
-			debug: log.New(io.Discard, "DEBUG: ", flag),
-			info:  log.New(io.Discard, "INFO: ", flag),
-			error: log.New(io.Discard, "ERROR: ", flag),
-		}
+		return Error
 	}
-}
-
-func (sl *SimpleLogger) SetLevel(level string) {
-	if sl.level != level {
-		*sl = *newLogger(level, sl.flag)
-	}
-}
-
-// Debug calls l.Output to print to the logger.
-func (sl *SimpleLogger) Debug(msg string) {
-	sl.debug.Println(msg)
-}
-
-// Debugf calls l.Output to print to the logger.
-func (sl *SimpleLogger) Debugf(format string, v ...interface{}) {
-	sl.debug.Printf(format, v...)
-}
-
-// Info calls l.Output to print to the logger.
-func (sl *SimpleLogger) Info(msg string) {
-	sl.info.Println(msg)
-}
-
-// Infof calls l.Output to print to the logger.
-func (sl *SimpleLogger) Infof(format string, v ...interface{}) {
-	sl.info.Printf(format, v...)
-}
-
-// Error calls l.Output to print to the logger.
-func (sl *SimpleLogger) Error(err error) {
-	sl.error.Println(err.Error())
-}
-
-// Errorf calls l.Output to print to the logger.
-func (sl *SimpleLogger) Errorf(format string, v ...interface{}) {
-	sl.error.Printf(format, v...)
-}
-
-// Dump calls l.Output to print error to the logger.
-func (sl *SimpleLogger) Dump(error error) {
-	sl.error.Println(error.Error())
-}
-
-// Fatal calls l.Output to print error to the logger and call os.Exit(1).
-func (sl *SimpleLogger) Fatal(error error) {
-	sl.error.Fatal(error.Error())
 }
 
 // SetDebugOutput set the internal logger.
 // Used for package testing.
 func (sl *SimpleLogger) SetDebugOutput(debug *bytes.Buffer) {
-	sl.debug = log.New(debug, "", 0)
+	sl.debugLogger = log.New(debug, "", 0)
 }
 
 // SetInfoOutput set the internal logger.
 // Used for package testing.
 func (sl *SimpleLogger) SetInfoOutput(info *bytes.Buffer) {
-	sl.info = log.New(info, "", 0)
+	sl.infoLogger = log.New(info, "", 0)
 }
 
 // SetErrorOutput set the internal logger.
 // Used for package testing.
 func (sl *SimpleLogger) SetErrorOutput(error *bytes.Buffer) {
-	sl.error = log.New(error, "", 0)
+	sl.errorLogger = log.New(error, "", 0)
 }

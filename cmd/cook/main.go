@@ -8,12 +8,13 @@ import (
 )
 
 const (
-	name = "cook"
-	env  = "ck"
+	name     = "cook"
+	env      = "ck"
+	logLevel = "info"
 )
 
 var (
-	log l.Logger = l.NewLogger(l.Level.Info, false)
+	log l.Logger = l.NewLogger(logLevel)
 )
 
 func main() {
