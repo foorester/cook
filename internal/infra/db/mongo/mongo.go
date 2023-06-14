@@ -14,7 +14,7 @@ import (
 
 type (
 	DB struct {
-		sys.Worker
+		sys.Core
 		client *mongo.Client
 		db     *mongo.Database
 	}
@@ -26,7 +26,7 @@ const (
 
 func NewDB(opts ...sys.Option) *DB {
 	return &DB{
-		Worker: sys.NewWorker(name, opts...),
+		Core:   sys.NewCore(name, opts...),
 		client: nil,
 	}
 }
