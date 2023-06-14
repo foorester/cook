@@ -16,7 +16,7 @@ type (
 
 type (
 	Supervisor interface {
-		Worker
+		Core
 		AddTasks(tasks ...Task)
 		AddShutdownTasks(tasks ...Teardown)
 		Wait() error
@@ -25,7 +25,7 @@ type (
 	}
 
 	supervisor struct {
-		*BaseWorker
+		*SimpleCore
 		tasks    []Task
 		teardown []Teardown
 		ctx      context.Context
@@ -51,7 +51,7 @@ func NewSupervisor(name string, notify bool, opts []Option, effects ...Effect) S
 	}
 
 	sv := &supervisor{
-		BaseWorker: NewWorker(name, opts...),
+		SimpleCore: NewCore(name, opts...),
 		tasks:      []Task{},
 		teardown:   []Teardown{},
 	}

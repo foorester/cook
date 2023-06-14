@@ -1,6 +1,6 @@
 package service
 
-import "github.com/foorester/cook/internal/core/model"
+import "github.com/foorester/cook/internal/domain/model"
 
 type (
 	GetBooksReq struct {

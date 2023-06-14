@@ -12,7 +12,7 @@ import (
 
 type (
 	DB struct {
-		sys.Worker
+		sys.Core
 		db *sqlx.DB
 	}
 )
@@ -23,8 +23,8 @@ const (
 
 func NewDB(opts ...sys.Option) *DB {
 	return &DB{
-		Worker: sys.NewWorker(name, opts...),
-		db:     nil,
+		Core: sys.NewCore(name, opts...),
+		db:   nil,
 	}
 }
 

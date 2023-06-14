@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	Worker interface {
+	Core interface {
 		Name() string
 		Log() log.Logger
 		Cfg() *config.Config
@@ -23,7 +23,7 @@ type (
 )
 
 type (
-	BaseWorker struct {
+	SimpleCore struct {
 		name     string
 		log      log.Logger
 		cfg      *config.Config
@@ -32,10 +32,10 @@ type (
 	}
 )
 
-func NewWorker(name string, opts ...Option) *BaseWorker {
+func NewCore(name string, opts ...Option) *SimpleCore {
 	name = GenName(name, "worker")
 
-	bw := &BaseWorker{
+	bw := &SimpleCore{
 		name: name,
 	}
 
@@ -46,41 +46,41 @@ func NewWorker(name string, opts ...Option) *BaseWorker {
 	return bw
 }
 
-func (bw *BaseWorker) Name() string {
-	return bw.name
+func (sc *SimpleCore) Name() string {
+	return sc.name
 }
 
-func (bw *BaseWorker) SetName(name string) {
-	bw.name = name
+func (sc *SimpleCore) SetName(name string) {
+	sc.name = name
 }
 
-func (bw *BaseWorker) Log() log.Logger {
-	return bw.log
+func (sc *SimpleCore) Log() log.Logger {
+	return sc.log
 }
 
-func (bw *BaseWorker) SetLog(log log.Logger) {
-	bw.log = log
+func (sc *SimpleCore) SetLog(log log.Logger) {
+	sc.log = log
 }
 
-func (bw *BaseWorker) Cfg() *config.Config {
-	return bw.cfg
+func (sc *SimpleCore) Cfg() *config.Config {
+	return sc.cfg
 }
 
-func (bw *BaseWorker) SetCfg(cfg *config.Config) {
-	bw.cfg = cfg
+func (sc *SimpleCore) SetCfg(cfg *config.Config) {
+	sc.cfg = cfg
 }
 
-func (bw *BaseWorker) Setup(ctx context.Context) {
-	bw.Log().Infof("%s setup", bw.Name())
+func (sc *SimpleCore) Setup(ctx context.Context) {
+	sc.Log().Infof("%s setup", sc.Name())
 }
 
-func (bw *BaseWorker) Start(ctx context.Context) error {
-	bw.Log().Infof("%s start", bw.Name())
+func (sc *SimpleCore) Start(ctx context.Context) error {
+	sc.Log().Infof("%s start", sc.Name())
 	return nil
 }
 
-func (bw *BaseWorker) Stop(ctx context.Context) error {
-	bw.Log().Infof("%s stop", bw.Name())
+func (sc *SimpleCore) Stop(ctx context.Context) error {
+	sc.Log().Infof("%s stop", sc.Name())
 	return nil
 }
 
@@ -103,17 +103,17 @@ func hash(s string) string {
 }
 
 type (
-	Option func(w *BaseWorker)
+	Option func(w *SimpleCore)
 )
 
 func WithConfig(cfg *config.Config) Option {
-	return func(svc *BaseWorker) {
+	return func(svc *SimpleCore) {
 		svc.SetCfg(cfg)
 	}
 }
 
 func WithLogger(log log.Logger) Option {
-	return func(svc *BaseWorker) {
+	return func(svc *SimpleCore) {
 		svc.SetLog(log)
 	}
 }

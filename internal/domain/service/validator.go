@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 
-	"github.com/foorester/cook/internal/core"
-	"github.com/foorester/cook/internal/core/model"
+	"github.com/foorester/cook/internal/domain"
+	"github.com/foorester/cook/internal/domain/model"
 )
 
 type (

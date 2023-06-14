@@ -3,7 +3,7 @@ package port
 import (
 	"context"
 
-	"github.com/foorester/cook/internal/core/model"
+	"github.com/foorester/cook/internal/domain/model"
 	"github.com/foorester/cook/internal/infra/db"
 )
 
