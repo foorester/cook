@@ -41,7 +41,7 @@ func dummyTeardown() {
 }
 
 func TestSupervisor(t *testing.T) {
-	// CreateRecipe a supervisor instance
+	// Create a supervisor instance
 	sv := system.NewSupervisor(name, notify, opts)
 
 	// AddTask tasks and teardown functions
@@ -67,7 +67,7 @@ func TestSupervisor(t *testing.T) {
 }
 
 func TestSupervisorWithSignal(t *testing.T) {
-	// CreateRecipe a supervisor instance with signal notification
+	// Create a supervisor instance with signal notification
 	sv := system.NewSupervisor(name, notify, opts)
 
 	// Capture the os.Interrupt signal to simulate termination
@@ -106,7 +106,7 @@ func TestSupervisorWithContextCancel(t *testing.T) {
 	parentCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	// CreateRecipe a supervisor instance with the parent context
+	// Create a supervisor instance with the parent context
 	sv := system.NewSupervisor(name, notify, opts)
 
 	// AddTask a dummy task
