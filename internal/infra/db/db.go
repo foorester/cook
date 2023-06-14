@@ -8,7 +8,7 @@ import (
 
 type (
 	DB interface {
-		sys.Worker
+		sys.Core
 		// DB - NOTE: See if there is a common set of features that can define what is returned by
 		// this function. For the moment it will return any (interface{}).
 		// Not ideal, forces type assertion when using specific implementation.

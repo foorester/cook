@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/foorester/cook/internal/core/model"
-	"github.com/foorester/cook/internal/core/service"
+	"github.com/foorester/cook/internal/domain/model"
+	"github.com/foorester/cook/internal/domain/service"
 	"github.com/foorester/cook/internal/infra/openapi"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/errors"
@@ -14,13 +14,13 @@ import (
 
 type (
 	CookHTTPHandler interface {
-		sys.Worker
+		sys.Core
 		openapi.ServerInterface
 		Service() service.RecipeService
 	}
 
 	CookHandler struct {
-		*sys.BaseWorker
+		*sys.SimpleCore
 		service service.RecipeService
 	}
 )
@@ -31,7 +31,7 @@ const (
 
 func NewCookHandler(opts ...sys.Option) *CookHandler {
 	return &CookHandler{
-		BaseWorker: sys.NewWorker(cookHandlerName, opts...),
+		SimpleCore: sys.NewCore(cookHandlerName, opts...),
 	}
 }
 

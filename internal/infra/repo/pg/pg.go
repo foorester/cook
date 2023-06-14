@@ -7,7 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
-	"github.com/foorester/cook/internal/core/model"
+	"github.com/foorester/cook/internal/domain/model"
 	"github.com/foorester/cook/internal/infra/db"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/errors"
@@ -15,7 +15,7 @@ import (
 
 type (
 	RecipeRepo struct {
-		*sys.BaseWorker
+		*sys.SimpleCore
 		db db.DB
 	}
 )
@@ -26,7 +26,7 @@ const (
 
 func NewRecipeRepo(db db.DB, opts ...sys.Option) *RecipeRepo {
 	return &RecipeRepo{
-		BaseWorker: sys.NewWorker(name, opts...),
+		SimpleCore: sys.NewCore(name, opts...),
 		db:         db,
 	}
 }

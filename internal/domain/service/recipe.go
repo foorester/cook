@@ -3,23 +3,23 @@ package service
 import (
 	"context"
 
-	"github.com/foorester/cook/internal/core"
-	"github.com/foorester/cook/internal/core/model"
-	"github.com/foorester/cook/internal/core/port"
+	"github.com/foorester/cook/internal/domain"
+	"github.com/foorester/cook/internal/domain/model"
+	"github.com/foorester/cook/internal/domain/port"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/errors"
 )
 
 type (
 	RecipeService interface {
-		sys.Worker
+		sys.Core
 		Repo() port.CookRepo
 		CreateBook(ctx context.Context, r model.Book) error
 		CreateRecipe(ctx context.Context, r model.Recipe) error
 	}
 
 	Recipe struct {
-		*sys.BaseWorker
+		*sys.SimpleCore
 		repo   port.CookRepo
 		mailer port.Mailer
 	}
@@ -31,7 +31,7 @@ const (
 
 func NewService(rr port.CookRepo, opts ...sys.Option) *Recipe {
 	return &Recipe{
-		BaseWorker: sys.NewWorker(name, opts...),
+		SimpleCore: sys.NewCore(name, opts...),
 		repo:       rr,
 		mailer:     nil, // Interface not implemented yet
 	}

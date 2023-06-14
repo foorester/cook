@@ -14,7 +14,7 @@ import (
 
 type (
 	Server struct {
-		sys.Worker
+		sys.Core
 		opts []sys.Option
 		http.Server
 		router Router
@@ -28,7 +28,7 @@ var (
 
 func NewServer(opts ...sys.Option) (server *Server) {
 	return &Server{
-		Worker: sys.NewWorker(httpServerName, opts...),
+		Core:   sys.NewCore(httpServerName, opts...),
 		opts:   opts,
 		router: NewRouter("root-router", opts...),
 	}

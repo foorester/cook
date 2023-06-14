@@ -8,7 +8,7 @@ import (
 
 type (
 	Router interface {
-		sys.Worker
+		sys.Core
 		chi.Router
 		Registerable
 	}
@@ -18,14 +18,14 @@ type (
 	}
 
 	SimpleRouter struct {
-		sys.Worker
+		sys.Core
 		chi.Router
 	}
 )
 
 func NewRouter(name string, opts ...sys.Option) Router {
 	return &SimpleRouter{
-		Worker: sys.NewWorker(name, opts...),
+		Core:   sys.NewCore(name, opts...),
 		Router: chi.NewRouter(),
 	}
 }
