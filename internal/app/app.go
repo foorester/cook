@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/foorester/cook/internal/core/service"
+	"github.com/foorester/cook/internal/domain/service"
 	"github.com/foorester/cook/internal/infra/db/pg"
 	http2 "github.com/foorester/cook/internal/infra/http"
 	pgr "github.com/foorester/cook/internal/infra/repo/pg"
@@ -17,7 +17,7 @@ import (
 
 type App struct {
 	sync.Mutex
-	sys.Worker
+	sys.Core
 	opts       []sys.Option
 	supervisor sys.Supervisor
 	http       *http2.Server
@@ -32,8 +32,8 @@ func NewApp(name, namespace string, log log.Logger) (app *App) {
 	}
 
 	app = &App{
-		Worker: sys.NewWorker(name, opts...),
-		opts:   opts,
+		Core: sys.NewCore(name, opts...),
+		opts: opts,
 	}
 
 	return app
