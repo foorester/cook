@@ -18,3 +18,7 @@ openapihttp:
 	oapi-codegen -generate chi-server -o internal/infra/openapi/cookapi.go -package openapi api/openapi/cook.yaml
 	oapi-codegen -generate types -o internal/client/openapi/cooktypes.go -package openapi api/openapi/cook.yaml
 	oapi-codegen -generate client -o internal/client/openapi/cookapi.go -package openapi api/openapi/cook.yaml
+
+.PHONY: gensqlcpg
+gensqlcpg:
+	sqlc generate -f ./configs/sqlc/pg.sqlc.yaml

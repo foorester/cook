@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "../../assets/sqlc/pg.statements.sql"
+    schema: "../../assets/sqlc/pg.schema.sql"
+    gen:
+      go:
+        package: "pg"
+        sql_package: "pgx/v5"
+        out: "../../internal/infra/repo/pg"
