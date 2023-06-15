@@ -14,24 +14,24 @@ import (
 )
 
 type (
-	RecipeRepo struct {
+	CookRepo struct {
 		*sys.SimpleCore
 		db db.DB
 	}
 )
 
 const (
-	name = "write-store"
+	name = "cook-repo"
 )
 
-func NewRecipeRepo(db db.DB, opts ...sys.Option) *RecipeRepo {
-	return &RecipeRepo{
+func NewRecipeRepo(db db.DB, opts ...sys.Option) *CookRepo {
+	return &CookRepo{
 		SimpleCore: sys.NewCore(name, opts...),
 		db:         db,
 	}
 }
 
-func (rr *RecipeRepo) Start(ctx context.Context) error {
+func (rr *CookRepo) Start(ctx context.Context) error {
 	err := rr.db.Start(ctx)
 	if err != nil {
 		msg := fmt.Sprintf("%s setup error", err)
@@ -41,11 +41,11 @@ func (rr *RecipeRepo) Start(ctx context.Context) error {
 	return nil
 }
 
-func (rr *RecipeRepo) DB() (db any) {
+func (rr *CookRepo) DB() (db any) {
 	return rr.db.DB()
 }
 
-func (rr *RecipeRepo) PgDB() (db *sqlx.DB, ok bool) {
+func (rr *CookRepo) PgDB() (db *sqlx.DB, ok bool) {
 	db, ok = rr.DB().(*sqlx.DB)
 	if !ok {
 		return db, false
@@ -54,7 +54,7 @@ func (rr *RecipeRepo) PgDB() (db *sqlx.DB, ok bool) {
 	return db, true
 }
 
-func (rr *RecipeRepo) CreateBook(ctx context.Context, r model.Book) (err error) {
+func (rr *CookRepo) CreateBook(ctx context.Context, r model.Book) (err error) {
 	books := []model.Book{r}
 
 	db, ok := rr.PgDB()
@@ -72,7 +72,7 @@ func (rr *RecipeRepo) CreateBook(ctx context.Context, r model.Book) (err error) 
 	return nil
 }
 
-func (rr *RecipeRepo) CreateRecipe(ctx context.Context, r model.Recipe) (err error) {
+func (rr *CookRepo) CreateRecipe(ctx context.Context, r model.Recipe) (err error) {
 	recipes := []model.Recipe{r}
 
 	db, ok := rr.PgDB()

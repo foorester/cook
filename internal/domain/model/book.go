@@ -5,5 +5,6 @@ type (
 		ID          string
 		Name        string
 		Description string
+		Owner       User
 	}
 )
