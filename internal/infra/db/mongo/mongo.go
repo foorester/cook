@@ -2,9 +2,9 @@ package mongo
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -60,8 +60,8 @@ func (db *DB) DB() any {
 	return db.db
 }
 
-func (db *DB) mongoDB() (sqlDB *sqlx.DB, ok bool) {
-	sqlDB, ok = db.DB().(*sqlx.DB)
+func (db *DB) mongoDB() (sqlDB *sql.DB, ok bool) {
+	sqlDB, ok = db.DB().(*sql.DB)
 	if !ok {
 		return sqlDB, false
 	}
@@ -71,10 +71,10 @@ func (db *DB) mongoDB() (sqlDB *sqlx.DB, ok bool) {
 
 func (db *DB) connString() (connString string) {
 	cfg := db.Cfg()
-	user := cfg.GetString("store.write.db.user")
-	pass := cfg.GetString("store.write.db.pass")
-	name := cfg.GetString("store.write.db.db")
-	host := cfg.GetString("store.write.db.host")
-	port := cfg.GetInt("store.write.db.port")
+	user := cfg.GetString("db.mongo.user")
+	pass := cfg.GetString("db.mongo.pass")
+	name := cfg.GetString("db.mongo.db")
+	host := cfg.GetString("db.mongo.host")
+	port := cfg.GetInt("db.mongo.port")
 	return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", user, pass, host, port, name)
 }

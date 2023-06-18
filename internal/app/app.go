@@ -57,7 +57,10 @@ func (app *App) Setup(ctx context.Context) error {
 	database := pg.NewDB(app.opts...)
 
 	// Repos
-	repo := pgr.NewRecipeRepo(database, app.opts...)
+	repo, err := pgr.NewCookRepo(database, app.opts...)
+	if err != nil {
+		return err
+	}
 
 	// Services
 	svc := service.NewService(repo, app.opts...)

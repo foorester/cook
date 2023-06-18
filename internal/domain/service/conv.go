@@ -1,6 +1,10 @@
 package service
 
-import "github.com/foorester/cook/internal/domain/model"
+import (
+	"github.com/google/uuid"
+
+	"github.com/foorester/cook/internal/domain/model"
+)
 
 type (
 	GetBooksReq struct {
@@ -15,7 +19,6 @@ type (
 
 type (
 	CreateBookReq struct {
-		ID          string
 		Name        string
 		Description string
 	}
@@ -25,7 +28,6 @@ type (
 
 func (req CreateBookReq) ToBook() model.Book {
 	return model.Book{
-		ID:          req.ID,
 		Name:        req.Name,
 		Description: req.Description,
 	}
@@ -82,7 +84,6 @@ type (
 
 type (
 	CreateRecipeReq struct {
-		ID   string
 		Name string
 	}
 
@@ -91,7 +92,6 @@ type (
 
 func (req CreateRecipeReq) ToRecipe() model.Recipe {
 	return model.Recipe{
-		ID:   req.ID,
 		Name: req.Name,
 	}
 }
@@ -251,3 +251,13 @@ type (
 )
 
 // UpdateIngredientReq validation logic
+
+// Misc
+func toUUID(uuidStr string) (uid uuid.UUID, err error) {
+	uid, err = uuid.Parse(uuidStr)
+	if err != nil {
+		return uid, InvalidID
+	}
+
+	return uid, nil
+}
