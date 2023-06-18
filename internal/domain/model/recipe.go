@@ -1,8 +1,10 @@
 package model
 
+import "github.com/google/uuid"
+
 type (
 	Recipe struct {
-		ID          string
+		ID          uuid.UUID
 		Name        string
 		Description string
 		Book        Book
@@ -11,7 +13,7 @@ type (
 	}
 
 	Ingredient struct {
-		ID          string
+		ID          uuid.UUID
 		Name        string
 		Description string
 		Recipe      Recipe
@@ -20,7 +22,7 @@ type (
 	}
 
 	Step struct {
-		ID          string
+		ID          uuid.UUID
 		Name        string
 		Description string
 		Recipe      Recipe

@@ -4,15 +4,13 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/foorester/cook/internal/infra/db"
 	"github.com/foorester/cook/internal/sys/errors"
 )
 
 type (
 	Tx struct {
-		tx sqlx.Tx
+		tx sql.Tx
 	}
 
 	TxContext struct {

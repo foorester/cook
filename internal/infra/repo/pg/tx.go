@@ -19,7 +19,7 @@ var (
 	TxNotFoundError = errors.New("no transaction found in context")
 )
 
-func (rr *CookRepo) Tx(ctx context.Context) (db.Tx, error) {
+func (cr *CookRepo) Tx(ctx context.Context) (db.Tx, error) {
 	tx, ok := ctx.Value(TxKey).(db.Tx)
 	if !ok {
 		return nil, TxNotFoundError
