@@ -2,18 +2,20 @@ package pg
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
+	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/foorester/cook/internal/sys"
+
 	"github.com/foorester/cook/internal/sys/errors"
 )
 
 type (
 	DB struct {
 		sys.Core
-		db *sqlx.DB
+		db *sql.DB
 	}
 )
 
@@ -33,7 +35,7 @@ func (db *DB) Start(ctx context.Context) error {
 }
 
 func (db *DB) Connect() error {
-	pgdb, err := sqlx.Open("postgres", db.connString())
+	pgdb, err := sql.Open("pgx", db.connString())
 	if err != nil {
 		msg := fmt.Sprintf("%s connection error", db.Name())
 		return errors.Wrap(msg, err)
@@ -55,10 +57,21 @@ func (db *DB) DB() any {
 
 func (db *DB) connString() (connString string) {
 	cfg := db.Cfg()
-	user := cfg.GetString("store.write.db.user")
-	pass := cfg.GetString("store.write.db.pass")
-	name := cfg.GetString("store.write.db.db")
-	host := cfg.GetString("store.write.db.host")
-	port := cfg.GetInt("store.write.db.port")
-	return fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=require", user, pass, name, host, port)
+	user := cfg.GetString("db.pg.user")
+	pass := cfg.GetString("db.pg.pass")
+	name := cfg.GetString("db.pg.db")
+	host := cfg.GetString("db.pg.host")
+	port := cfg.GetInt("db.pg.port")
+	schema := cfg.GetString("db.pg.schema")
+	sslMode := cfg.GetBool("db.pg.sslmode")
+
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d search_path=%s", user, pass, name, host, port, schema)
+
+	if sslMode {
+		connStr = connStr + " sslmode=disable"
+	} else {
+		connStr = connStr + " sslmode=disable"
+	}
+
+	return connStr
 }
