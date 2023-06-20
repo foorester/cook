@@ -15,5 +15,12 @@ func NewError(msg string) HTTPError {
 }
 
 var (
-	InvalidJSONBodyErr = NewError("invalid JSON body")
+	MethodNotAllowedErr   = errors.NewError("method not allowed")
+	InvalidResourceErr    = errors.NewError("invalid resource")
+	NoUserErr             = errors.NewError("not a valid user in session")
+	NoResourceErr         = errors.NewError("no resource ID provided")
+	NoAssetReqErr         = errors.NewError("no asset request provided")
+	InvalidRequestErr     = errors.NewError("invalid request")
+	InvalidRequestDataErr = errors.NewError("invalid request data")
+	InvalidJSONBodyErr    = NewError("invalid JSON body")
 )

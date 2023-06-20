@@ -13,7 +13,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/deepmap/oapi-codegen/pkg/runtime"
+	"github.com/foorester/oapi-codegen/pkg/runtime"
 )
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
@@ -89,13 +89,13 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// GetRecipeBooks request
-	GetRecipeBooks(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetBooks request
+	GetBooks(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostRecipeBook request with any body
-	PostRecipeBookWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostBook request with any body
+	PostBookWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PostRecipeBook(ctx context.Context, body PostRecipeBookJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostBook(ctx context.Context, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteBook request
 	DeleteBook(ctx context.Context, bookId string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -127,22 +127,6 @@ type ClientInterface interface {
 
 	PutRecipe(ctx context.Context, bookId string, recipeId string, body PutRecipeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetDirectionSteps request
-	GetDirectionSteps(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PostDirectionStep request with any body
-	PostDirectionStepWithBody(ctx context.Context, bookId string, recipeId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PostDirectionStep(ctx context.Context, bookId string, recipeId string, body PostDirectionStepJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetStep request
-	GetStep(ctx context.Context, bookId string, recipeId string, stepId string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PutStep request with any body
-	PutStepWithBody(ctx context.Context, bookId string, recipeId string, stepId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PutStep(ctx context.Context, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// GetIngredients request
 	GetIngredients(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -161,10 +145,26 @@ type ClientInterface interface {
 	PutIngredientWithBody(ctx context.Context, bookId string, recipeId string, ingredientId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	PutIngredient(ctx context.Context, bookId string, recipeId string, ingredientId string, body PutIngredientJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSteps request
+	GetSteps(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostStep request with any body
+	PostStepWithBody(ctx context.Context, bookId string, recipeId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostStep(ctx context.Context, bookId string, recipeId string, body PostStepJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetStep request
+	GetStep(ctx context.Context, bookId string, recipeId string, stepId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PutStep request with any body
+	PutStepWithBody(ctx context.Context, bookId string, recipeId string, stepId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PutStep(ctx context.Context, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) GetRecipeBooks(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetRecipeBooksRequest(c.Server)
+func (c *Client) GetBooks(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBooksRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -175,8 +175,8 @@ func (c *Client) GetRecipeBooks(ctx context.Context, reqEditors ...RequestEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostRecipeBookWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostRecipeBookRequestWithBody(c.Server, contentType, body)
+func (c *Client) PostBookWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostBookRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -187,8 +187,8 @@ func (c *Client) PostRecipeBookWithBody(ctx context.Context, contentType string,
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostRecipeBook(ctx context.Context, body PostRecipeBookJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostRecipeBookRequest(c.Server, body)
+func (c *Client) PostBook(ctx context.Context, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostBookRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -331,78 +331,6 @@ func (c *Client) PutRecipe(ctx context.Context, bookId string, recipeId string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetDirectionSteps(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetDirectionStepsRequest(c.Server, bookId, recipeId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PostDirectionStepWithBody(ctx context.Context, bookId string, recipeId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostDirectionStepRequestWithBody(c.Server, bookId, recipeId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PostDirectionStep(ctx context.Context, bookId string, recipeId string, body PostDirectionStepJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostDirectionStepRequest(c.Server, bookId, recipeId, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetStep(ctx context.Context, bookId string, recipeId string, stepId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetStepRequest(c.Server, bookId, recipeId, stepId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PutStepWithBody(ctx context.Context, bookId string, recipeId string, stepId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPutStepRequestWithBody(c.Server, bookId, recipeId, stepId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PutStep(ctx context.Context, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPutStepRequest(c.Server, bookId, recipeId, stepId, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) GetIngredients(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetIngredientsRequest(c.Server, bookId, recipeId)
 	if err != nil {
@@ -487,8 +415,80 @@ func (c *Client) PutIngredient(ctx context.Context, bookId string, recipeId stri
 	return c.Client.Do(req)
 }
 
-// NewGetRecipeBooksRequest generates requests for GetRecipeBooks
-func NewGetRecipeBooksRequest(server string) (*http.Request, error) {
+func (c *Client) GetSteps(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetStepsRequest(c.Server, bookId, recipeId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostStepWithBody(ctx context.Context, bookId string, recipeId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostStepRequestWithBody(c.Server, bookId, recipeId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostStep(ctx context.Context, bookId string, recipeId string, body PostStepJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostStepRequest(c.Server, bookId, recipeId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetStep(ctx context.Context, bookId string, recipeId string, stepId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetStepRequest(c.Server, bookId, recipeId, stepId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutStepWithBody(ctx context.Context, bookId string, recipeId string, stepId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutStepRequestWithBody(c.Server, bookId, recipeId, stepId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutStep(ctx context.Context, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutStepRequest(c.Server, bookId, recipeId, stepId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// NewGetBooksRequest generates requests for GetBooks
+func NewGetBooksRequest(server string) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -496,7 +496,7 @@ func NewGetRecipeBooksRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books")
+	operationPath := fmt.Sprintf("/books")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -514,19 +514,19 @@ func NewGetRecipeBooksRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewPostRecipeBookRequest calls the generic PostRecipeBook builder with application/json body
-func NewPostRecipeBookRequest(server string, body PostRecipeBookJSONRequestBody) (*http.Request, error) {
+// NewPostBookRequest calls the generic PostBook builder with application/json body
+func NewPostBookRequest(server string, body PostBookJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostRecipeBookRequestWithBody(server, "application/json", bodyReader)
+	return NewPostBookRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewPostRecipeBookRequestWithBody generates requests for PostRecipeBook with any type of body
-func NewPostRecipeBookRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostBookRequestWithBody generates requests for PostBook with any type of body
+func NewPostBookRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -534,7 +534,7 @@ func NewPostRecipeBookRequestWithBody(server string, contentType string, body io
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books")
+	operationPath := fmt.Sprintf("/books")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -570,7 +570,7 @@ func NewDeleteBookRequest(server string, bookId string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s", pathParam0)
+	operationPath := fmt.Sprintf("/books/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -604,7 +604,7 @@ func NewGetBookRequest(server string, bookId string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s", pathParam0)
+	operationPath := fmt.Sprintf("/books/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -649,7 +649,7 @@ func NewPutBookRequestWithBody(server string, bookId string, contentType string,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s", pathParam0)
+	operationPath := fmt.Sprintf("/books/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -685,7 +685,7 @@ func NewGetRecipesRequest(server string, bookId string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes", pathParam0)
+	operationPath := fmt.Sprintf("/books/%s/recipes", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -730,7 +730,7 @@ func NewPostRecipeRequestWithBody(server string, bookId string, contentType stri
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes", pathParam0)
+	operationPath := fmt.Sprintf("/books/%s/recipes", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -773,7 +773,7 @@ func NewDeleteRecipeRequest(server string, bookId string, recipeId string) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -814,7 +814,7 @@ func NewGetRecipeRequest(server string, bookId string, recipeId string) (*http.R
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -866,211 +866,7 @@ func NewPutRecipeRequestWithBody(server string, bookId string, recipeId string, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewGetDirectionStepsRequest generates requests for GetDirectionSteps
-func NewGetDirectionStepsRequest(server string, bookId string, recipeId string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "bookId", runtime.ParamLocationPath, bookId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, recipeId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s/direction-steps", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPostDirectionStepRequest calls the generic PostDirectionStep builder with application/json body
-func NewPostDirectionStepRequest(server string, bookId string, recipeId string, body PostDirectionStepJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPostDirectionStepRequestWithBody(server, bookId, recipeId, "application/json", bodyReader)
-}
-
-// NewPostDirectionStepRequestWithBody generates requests for PostDirectionStep with any type of body
-func NewPostDirectionStepRequestWithBody(server string, bookId string, recipeId string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "bookId", runtime.ParamLocationPath, bookId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, recipeId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s/direction-steps", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewGetStepRequest generates requests for GetStep
-func NewGetStepRequest(server string, bookId string, recipeId string, stepId string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "bookId", runtime.ParamLocationPath, bookId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, recipeId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam2 string
-
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "stepId", runtime.ParamLocationPath, stepId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s/direction-steps/%s", pathParam0, pathParam1, pathParam2)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPutStepRequest calls the generic PutStep builder with application/json body
-func NewPutStepRequest(server string, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPutStepRequestWithBody(server, bookId, recipeId, stepId, "application/json", bodyReader)
-}
-
-// NewPutStepRequestWithBody generates requests for PutStep with any type of body
-func NewPutStepRequestWithBody(server string, bookId string, recipeId string, stepId string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "bookId", runtime.ParamLocationPath, bookId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, recipeId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam2 string
-
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "stepId", runtime.ParamLocationPath, stepId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s/direction-steps/%s", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1113,7 +909,7 @@ func NewGetIngredientsRequest(server string, bookId string, recipeId string) (*h
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s/ingredients", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s/ingredients", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1165,7 +961,7 @@ func NewPostIngredientRequestWithBody(server string, bookId string, recipeId str
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s/ingredients", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s/ingredients", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1215,7 +1011,7 @@ func NewDeleteIngredientRequest(server string, bookId string, recipeId string, i
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s/ingredients/%s", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s/ingredients/%s", pathParam0, pathParam1, pathParam2)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1263,7 +1059,7 @@ func NewGetIngredientRequest(server string, bookId string, recipeId string, ingr
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s/ingredients/%s", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s/ingredients/%s", pathParam0, pathParam1, pathParam2)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1322,7 +1118,211 @@ func NewPutIngredientRequestWithBody(server string, bookId string, recipeId stri
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/recipe-books/%s/recipes/%s/ingredients/%s", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s/ingredients/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetStepsRequest generates requests for GetSteps
+func NewGetStepsRequest(server string, bookId string, recipeId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "bookId", runtime.ParamLocationPath, bookId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, recipeId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s/steps", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostStepRequest calls the generic PostStep builder with application/json body
+func NewPostStepRequest(server string, bookId string, recipeId string, body PostStepJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostStepRequestWithBody(server, bookId, recipeId, "application/json", bodyReader)
+}
+
+// NewPostStepRequestWithBody generates requests for PostStep with any type of body
+func NewPostStepRequestWithBody(server string, bookId string, recipeId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "bookId", runtime.ParamLocationPath, bookId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, recipeId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s/steps", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetStepRequest generates requests for GetStep
+func NewGetStepRequest(server string, bookId string, recipeId string, stepId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "bookId", runtime.ParamLocationPath, bookId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, recipeId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "stepId", runtime.ParamLocationPath, stepId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s/steps/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPutStepRequest calls the generic PutStep builder with application/json body
+func NewPutStepRequest(server string, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPutStepRequestWithBody(server, bookId, recipeId, stepId, "application/json", bodyReader)
+}
+
+// NewPutStepRequestWithBody generates requests for PutStep with any type of body
+func NewPutStepRequestWithBody(server string, bookId string, recipeId string, stepId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "bookId", runtime.ParamLocationPath, bookId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, recipeId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "stepId", runtime.ParamLocationPath, stepId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/books/%s/recipes/%s/steps/%s", pathParam0, pathParam1, pathParam2)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1385,13 +1385,13 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetRecipeBooks request
-	GetRecipeBooksWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetRecipeBooksResponse, error)
+	// GetBooks request
+	GetBooksWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetBooksResponse, error)
 
-	// PostRecipeBook request with any body
-	PostRecipeBookWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRecipeBookResponse, error)
+	// PostBook request with any body
+	PostBookWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostBookResponse, error)
 
-	PostRecipeBookWithResponse(ctx context.Context, body PostRecipeBookJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRecipeBookResponse, error)
+	PostBookWithResponse(ctx context.Context, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*PostBookResponse, error)
 
 	// DeleteBook request
 	DeleteBookWithResponse(ctx context.Context, bookId string, reqEditors ...RequestEditorFn) (*DeleteBookResponse, error)
@@ -1423,22 +1423,6 @@ type ClientWithResponsesInterface interface {
 
 	PutRecipeWithResponse(ctx context.Context, bookId string, recipeId string, body PutRecipeJSONRequestBody, reqEditors ...RequestEditorFn) (*PutRecipeResponse, error)
 
-	// GetDirectionSteps request
-	GetDirectionStepsWithResponse(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*GetDirectionStepsResponse, error)
-
-	// PostDirectionStep request with any body
-	PostDirectionStepWithBodyWithResponse(ctx context.Context, bookId string, recipeId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostDirectionStepResponse, error)
-
-	PostDirectionStepWithResponse(ctx context.Context, bookId string, recipeId string, body PostDirectionStepJSONRequestBody, reqEditors ...RequestEditorFn) (*PostDirectionStepResponse, error)
-
-	// GetStep request
-	GetStepWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, reqEditors ...RequestEditorFn) (*GetStepResponse, error)
-
-	// PutStep request with any body
-	PutStepWithBodyWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutStepResponse, error)
-
-	PutStepWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody, reqEditors ...RequestEditorFn) (*PutStepResponse, error)
-
 	// GetIngredients request
 	GetIngredientsWithResponse(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*GetIngredientsResponse, error)
 
@@ -1457,16 +1441,32 @@ type ClientWithResponsesInterface interface {
 	PutIngredientWithBodyWithResponse(ctx context.Context, bookId string, recipeId string, ingredientId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutIngredientResponse, error)
 
 	PutIngredientWithResponse(ctx context.Context, bookId string, recipeId string, ingredientId string, body PutIngredientJSONRequestBody, reqEditors ...RequestEditorFn) (*PutIngredientResponse, error)
+
+	// GetSteps request
+	GetStepsWithResponse(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*GetStepsResponse, error)
+
+	// PostStep request with any body
+	PostStepWithBodyWithResponse(ctx context.Context, bookId string, recipeId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostStepResponse, error)
+
+	PostStepWithResponse(ctx context.Context, bookId string, recipeId string, body PostStepJSONRequestBody, reqEditors ...RequestEditorFn) (*PostStepResponse, error)
+
+	// GetStep request
+	GetStepWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, reqEditors ...RequestEditorFn) (*GetStepResponse, error)
+
+	// PutStep request with any body
+	PutStepWithBodyWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutStepResponse, error)
+
+	PutStepWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody, reqEditors ...RequestEditorFn) (*PutStepResponse, error)
 }
 
-type GetRecipeBooksResponse struct {
+type GetBooksResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *RecipeBookList
+	JSON200      *BookList
 }
 
 // Status returns HTTPResponse.Status
-func (r GetRecipeBooksResponse) Status() string {
+func (r GetBooksResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1474,21 +1474,21 @@ func (r GetRecipeBooksResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetRecipeBooksResponse) StatusCode() int {
+func (r GetBooksResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type PostRecipeBookResponse struct {
+type PostBookResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *RecipeBook
+	JSON201      *Book
 }
 
 // Status returns HTTPResponse.Status
-func (r PostRecipeBookResponse) Status() string {
+func (r PostBookResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1496,7 +1496,7 @@ func (r PostRecipeBookResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostRecipeBookResponse) StatusCode() int {
+func (r PostBookResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1527,7 +1527,7 @@ func (r DeleteBookResponse) StatusCode() int {
 type GetBookResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *RecipeBook
+	JSON200      *Book
 }
 
 // Status returns HTTPResponse.Status
@@ -1549,7 +1549,7 @@ func (r GetBookResponse) StatusCode() int {
 type PutBookResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *RecipeBook
+	JSON200      *Book
 }
 
 // Status returns HTTPResponse.Status
@@ -1676,93 +1676,6 @@ func (r PutRecipeResponse) StatusCode() int {
 	return 0
 }
 
-type GetDirectionStepsResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *DirectionStepList
-}
-
-// Status returns HTTPResponse.Status
-func (r GetDirectionStepsResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetDirectionStepsResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type PostDirectionStepResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *DirectionStep
-}
-
-// Status returns HTTPResponse.Status
-func (r PostDirectionStepResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r PostDirectionStepResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetStepResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *DirectionStep
-}
-
-// Status returns HTTPResponse.Status
-func (r GetStepResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetStepResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type PutStepResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-}
-
-// Status returns HTTPResponse.Status
-func (r PutStepResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r PutStepResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type GetIngredientsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -1872,30 +1785,117 @@ func (r PutIngredientResponse) StatusCode() int {
 	return 0
 }
 
-// GetRecipeBooksWithResponse request returning *GetRecipeBooksResponse
-func (c *ClientWithResponses) GetRecipeBooksWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetRecipeBooksResponse, error) {
-	rsp, err := c.GetRecipeBooks(ctx, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetRecipeBooksResponse(rsp)
+type GetStepsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *StepList
 }
 
-// PostRecipeBookWithBodyWithResponse request with arbitrary body returning *PostRecipeBookResponse
-func (c *ClientWithResponses) PostRecipeBookWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRecipeBookResponse, error) {
-	rsp, err := c.PostRecipeBookWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
+// Status returns HTTPResponse.Status
+func (r GetStepsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
 	}
-	return ParsePostRecipeBookResponse(rsp)
+	return http.StatusText(0)
 }
 
-func (c *ClientWithResponses) PostRecipeBookWithResponse(ctx context.Context, body PostRecipeBookJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRecipeBookResponse, error) {
-	rsp, err := c.PostRecipeBook(ctx, body, reqEditors...)
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetStepsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostStepResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *Step
+}
+
+// Status returns HTTPResponse.Status
+func (r PostStepResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostStepResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetStepResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Step
+}
+
+// Status returns HTTPResponse.Status
+func (r GetStepResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetStepResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PutStepResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r PutStepResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PutStepResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// GetBooksWithResponse request returning *GetBooksResponse
+func (c *ClientWithResponses) GetBooksWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetBooksResponse, error) {
+	rsp, err := c.GetBooks(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostRecipeBookResponse(rsp)
+	return ParseGetBooksResponse(rsp)
+}
+
+// PostBookWithBodyWithResponse request with arbitrary body returning *PostBookResponse
+func (c *ClientWithResponses) PostBookWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostBookResponse, error) {
+	rsp, err := c.PostBookWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostBookResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostBookWithResponse(ctx context.Context, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*PostBookResponse, error) {
+	rsp, err := c.PostBook(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostBookResponse(rsp)
 }
 
 // DeleteBookWithResponse request returning *DeleteBookResponse
@@ -1994,58 +1994,6 @@ func (c *ClientWithResponses) PutRecipeWithResponse(ctx context.Context, bookId 
 	return ParsePutRecipeResponse(rsp)
 }
 
-// GetDirectionStepsWithResponse request returning *GetDirectionStepsResponse
-func (c *ClientWithResponses) GetDirectionStepsWithResponse(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*GetDirectionStepsResponse, error) {
-	rsp, err := c.GetDirectionSteps(ctx, bookId, recipeId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetDirectionStepsResponse(rsp)
-}
-
-// PostDirectionStepWithBodyWithResponse request with arbitrary body returning *PostDirectionStepResponse
-func (c *ClientWithResponses) PostDirectionStepWithBodyWithResponse(ctx context.Context, bookId string, recipeId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostDirectionStepResponse, error) {
-	rsp, err := c.PostDirectionStepWithBody(ctx, bookId, recipeId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostDirectionStepResponse(rsp)
-}
-
-func (c *ClientWithResponses) PostDirectionStepWithResponse(ctx context.Context, bookId string, recipeId string, body PostDirectionStepJSONRequestBody, reqEditors ...RequestEditorFn) (*PostDirectionStepResponse, error) {
-	rsp, err := c.PostDirectionStep(ctx, bookId, recipeId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostDirectionStepResponse(rsp)
-}
-
-// GetStepWithResponse request returning *GetStepResponse
-func (c *ClientWithResponses) GetStepWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, reqEditors ...RequestEditorFn) (*GetStepResponse, error) {
-	rsp, err := c.GetStep(ctx, bookId, recipeId, stepId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetStepResponse(rsp)
-}
-
-// PutStepWithBodyWithResponse request with arbitrary body returning *PutStepResponse
-func (c *ClientWithResponses) PutStepWithBodyWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutStepResponse, error) {
-	rsp, err := c.PutStepWithBody(ctx, bookId, recipeId, stepId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePutStepResponse(rsp)
-}
-
-func (c *ClientWithResponses) PutStepWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody, reqEditors ...RequestEditorFn) (*PutStepResponse, error) {
-	rsp, err := c.PutStep(ctx, bookId, recipeId, stepId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePutStepResponse(rsp)
-}
-
 // GetIngredientsWithResponse request returning *GetIngredientsResponse
 func (c *ClientWithResponses) GetIngredientsWithResponse(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*GetIngredientsResponse, error) {
 	rsp, err := c.GetIngredients(ctx, bookId, recipeId, reqEditors...)
@@ -2107,22 +2055,74 @@ func (c *ClientWithResponses) PutIngredientWithResponse(ctx context.Context, boo
 	return ParsePutIngredientResponse(rsp)
 }
 
-// ParseGetRecipeBooksResponse parses an HTTP response from a GetRecipeBooksWithResponse call
-func ParseGetRecipeBooksResponse(rsp *http.Response) (*GetRecipeBooksResponse, error) {
+// GetStepsWithResponse request returning *GetStepsResponse
+func (c *ClientWithResponses) GetStepsWithResponse(ctx context.Context, bookId string, recipeId string, reqEditors ...RequestEditorFn) (*GetStepsResponse, error) {
+	rsp, err := c.GetSteps(ctx, bookId, recipeId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetStepsResponse(rsp)
+}
+
+// PostStepWithBodyWithResponse request with arbitrary body returning *PostStepResponse
+func (c *ClientWithResponses) PostStepWithBodyWithResponse(ctx context.Context, bookId string, recipeId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostStepResponse, error) {
+	rsp, err := c.PostStepWithBody(ctx, bookId, recipeId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostStepResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostStepWithResponse(ctx context.Context, bookId string, recipeId string, body PostStepJSONRequestBody, reqEditors ...RequestEditorFn) (*PostStepResponse, error) {
+	rsp, err := c.PostStep(ctx, bookId, recipeId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostStepResponse(rsp)
+}
+
+// GetStepWithResponse request returning *GetStepResponse
+func (c *ClientWithResponses) GetStepWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, reqEditors ...RequestEditorFn) (*GetStepResponse, error) {
+	rsp, err := c.GetStep(ctx, bookId, recipeId, stepId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetStepResponse(rsp)
+}
+
+// PutStepWithBodyWithResponse request with arbitrary body returning *PutStepResponse
+func (c *ClientWithResponses) PutStepWithBodyWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutStepResponse, error) {
+	rsp, err := c.PutStepWithBody(ctx, bookId, recipeId, stepId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePutStepResponse(rsp)
+}
+
+func (c *ClientWithResponses) PutStepWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody, reqEditors ...RequestEditorFn) (*PutStepResponse, error) {
+	rsp, err := c.PutStep(ctx, bookId, recipeId, stepId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePutStepResponse(rsp)
+}
+
+// ParseGetBooksResponse parses an HTTP response from a GetBooksWithResponse call
+func ParseGetBooksResponse(rsp *http.Response) (*GetBooksResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetRecipeBooksResponse{
+	response := &GetBooksResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest RecipeBookList
+		var dest BookList
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2133,22 +2133,22 @@ func ParseGetRecipeBooksResponse(rsp *http.Response) (*GetRecipeBooksResponse, e
 	return response, nil
 }
 
-// ParsePostRecipeBookResponse parses an HTTP response from a PostRecipeBookWithResponse call
-func ParsePostRecipeBookResponse(rsp *http.Response) (*PostRecipeBookResponse, error) {
+// ParsePostBookResponse parses an HTTP response from a PostBookWithResponse call
+func ParsePostBookResponse(rsp *http.Response) (*PostBookResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostRecipeBookResponse{
+	response := &PostBookResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest RecipeBook
+		var dest Book
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2190,7 +2190,7 @@ func ParseGetBookResponse(rsp *http.Response) (*GetBookResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest RecipeBook
+		var dest Book
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2216,7 +2216,7 @@ func ParsePutBookResponse(rsp *http.Response) (*PutBookResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest RecipeBook
+		var dest Book
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2337,100 +2337,6 @@ func ParsePutRecipeResponse(rsp *http.Response) (*PutRecipeResponse, error) {
 	return response, nil
 }
 
-// ParseGetDirectionStepsResponse parses an HTTP response from a GetDirectionStepsWithResponse call
-func ParseGetDirectionStepsResponse(rsp *http.Response) (*GetDirectionStepsResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetDirectionStepsResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest DirectionStepList
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParsePostDirectionStepResponse parses an HTTP response from a PostDirectionStepWithResponse call
-func ParsePostDirectionStepResponse(rsp *http.Response) (*PostDirectionStepResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PostDirectionStepResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest DirectionStep
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON201 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetStepResponse parses an HTTP response from a GetStepWithResponse call
-func ParseGetStepResponse(rsp *http.Response) (*GetStepResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetStepResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest DirectionStep
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParsePutStepResponse parses an HTTP response from a PutStepWithResponse call
-func ParsePutStepResponse(rsp *http.Response) (*PutStepResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PutStepResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	return response, nil
-}
-
 // ParseGetIngredientsResponse parses an HTTP response from a GetIngredientsWithResponse call
 func ParseGetIngredientsResponse(rsp *http.Response) (*GetIngredientsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2546,6 +2452,100 @@ func ParsePutIngredientResponse(rsp *http.Response) (*PutIngredientResponse, err
 		}
 		response.JSON200 = &dest
 
+	}
+
+	return response, nil
+}
+
+// ParseGetStepsResponse parses an HTTP response from a GetStepsWithResponse call
+func ParseGetStepsResponse(rsp *http.Response) (*GetStepsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetStepsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest StepList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostStepResponse parses an HTTP response from a PostStepWithResponse call
+func ParsePostStepResponse(rsp *http.Response) (*PostStepResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostStepResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest Step
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetStepResponse parses an HTTP response from a GetStepWithResponse call
+func ParseGetStepResponse(rsp *http.Response) (*GetStepResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetStepResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Step
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePutStepResponse parses an HTTP response from a PutStepWithResponse call
+func ParsePutStepResponse(rsp *http.Response) (*PutStepResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PutStepResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
 	}
 
 	return response, nil

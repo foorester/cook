@@ -11,12 +11,12 @@ import (
 func toInsertBookParams(b model.Book) (p InsertBookParams, err error) {
 	bookID, ok := toPgUUID(b.ID)
 	if !ok {
-		return p, errors.Wrap("invalid book ID", InvalidID)
+		return p, errors.Wrap("invalid book ID", InvalidResourceIDErr)
 	}
 
 	ownerID, ok := toPgUUID(b.Owner.ID)
 	if !ok {
-		return p, errors.Wrap("invalid owner ID", InvalidID)
+		return p, errors.Wrap("invalid owner ID", InvalidResourceIDErr)
 	}
 
 	return InsertBookParams{
