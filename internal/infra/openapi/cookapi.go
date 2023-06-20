@@ -8,69 +8,69 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/deepmap/oapi-codegen/pkg/runtime"
+	"github.com/foorester/oapi-codegen/pkg/runtime"
 	"github.com/go-chi/chi/v5"
 )
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Retrieve all recipe books
-	// (GET /recipe-books)
-	GetRecipeBooks(w http.ResponseWriter, r *http.Request)
-	// CreateRecipe a new recipe book
-	// (POST /recipe-books)
-	PostRecipeBook(w http.ResponseWriter, r *http.Request)
-	// Delete a specific recipe book
-	// (DELETE /recipe-books/{bookId})
+	// Retrieve all books
+	// (GET /books)
+	GetBooks(w http.ResponseWriter, r *http.Request)
+	// Create a new book
+	// (POST /books)
+	PostBook(w http.ResponseWriter, r *http.Request)
+	// Delete a specific book
+	// (DELETE /books/{bookId})
 	DeleteBook(w http.ResponseWriter, r *http.Request, bookId string)
-	// Retrieve a specific recipe book
-	// (GET /recipe-books/{bookId})
+	// Retrieve a specific book
+	// (GET /books/{bookId})
 	GetBook(w http.ResponseWriter, r *http.Request, bookId string)
-	// Update a specific recipe book
-	// (PUT /recipe-books/{bookId})
+	// Update a specific book
+	// (PUT /books/{bookId})
 	PutBook(w http.ResponseWriter, r *http.Request, bookId string)
-	// Retrieve all recipes in a recipe book
-	// (GET /recipe-books/{bookId}/recipes)
+	// Retrieve all recipes in a book
+	// (GET /books/{bookId}/recipes)
 	GetRecipes(w http.ResponseWriter, r *http.Request, bookId string)
-	// CreateRecipe a new recipe in a recipe book
-	// (POST /recipe-books/{bookId}/recipes)
+	// Create a new recipe in a book
+	// (POST /books/{bookId}/recipes)
 	PostRecipe(w http.ResponseWriter, r *http.Request, bookId string)
-	// Delete a specific recipe in a recipe book
-	// (DELETE /recipe-books/{bookId}/recipes/{recipeId})
+	// Delete a specific recipe in a book
+	// (DELETE /books/{bookId}/recipes/{recipeId})
 	DeleteRecipe(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
-	// Retrieve a specific recipe in a recipe book
-	// (GET /recipe-books/{bookId}/recipes/{recipeId})
+	// Retrieve a specific recipe in a book
+	// (GET /books/{bookId}/recipes/{recipeId})
 	GetRecipe(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
-	// Update a specific recipe in a recipe book
-	// (PUT /recipe-books/{bookId}/recipes/{recipeId})
+	// Update a specific recipe in a book
+	// (PUT /books/{bookId}/recipes/{recipeId})
 	PutRecipe(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
-	// Retrieve all direction steps in a recipe
-	// (GET /recipe-books/{bookId}/recipes/{recipeId}/direction-steps)
-	GetSteps(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
-	// CreateRecipe a new direction step in a recipe
-	// (POST /recipe-books/{bookId}/recipes/{recipeId}/direction-steps)
-	PostStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
-	// Retrieve a specific direction step in a recipe
-	// (GET /recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId})
-	GetStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, stepId string)
-	// Update a specific direction step in a recipe
-	// (PUT /recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId})
-	PutStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, stepId string)
 	// Retrieve all ingredients in a recipe
-	// (GET /recipe-books/{bookId}/recipes/{recipeId}/ingredients)
+	// (GET /books/{bookId}/recipes/{recipeId}/ingredients)
 	GetIngredients(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
-	// CreateRecipe a new ingredient in a recipe
-	// (POST /recipe-books/{bookId}/recipes/{recipeId}/ingredients)
+	// Create a new ingredient in a recipe
+	// (POST /books/{bookId}/recipes/{recipeId}/ingredients)
 	PostIngredient(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
 	// Delete a specific ingredient in a recipe
-	// (DELETE /recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId})
+	// (DELETE /books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId})
 	DeleteIngredient(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, ingredientId string)
 	// Retrieve a specific ingredient in a recipe
-	// (GET /recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId})
+	// (GET /books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId})
 	GetIngredient(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, ingredientId string)
 	// Update a specific ingredient in a recipe
-	// (PUT /recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId})
+	// (PUT /books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId})
 	PutIngredient(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, ingredientId string)
+	// Retrieve all steps in a recipe
+	// (GET /books/{bookId}/recipes/{recipeId}/steps)
+	GetSteps(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	// Create a new step in a recipe
+	// (POST /books/{bookId}/recipes/{recipeId}/steps)
+	PostStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string)
+	// Retrieve a specific step in a recipe
+	// (GET /books/{bookId}/recipes/{recipeId}/steps/{stepId})
+	GetStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, stepId string)
+	// Update a specific step in a recipe
+	// (PUT /books/{bookId}/recipes/{recipeId}/steps/{stepId})
+	PutStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, stepId string)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -82,14 +82,14 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
-// GetRecipeBooks operation middleware
-func (siw *ServerInterfaceWrapper) GetRecipeBooks(w http.ResponseWriter, r *http.Request) {
+// GetBooks operation middleware
+func (siw *ServerInterfaceWrapper) GetBooks(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
 
 	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetRecipeBooks(w, r)
+		siw.Handler.GetBooks(w, r)
 	})
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -99,14 +99,14 @@ func (siw *ServerInterfaceWrapper) GetRecipeBooks(w http.ResponseWriter, r *http
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
-// PostRecipeBook operation middleware
-func (siw *ServerInterfaceWrapper) PostRecipeBook(w http.ResponseWriter, r *http.Request) {
+// PostBook operation middleware
+func (siw *ServerInterfaceWrapper) PostBook(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
 
 	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PostRecipeBook(w, r)
+		siw.Handler.PostBook(w, r)
 	})
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -173,7 +173,7 @@ func (siw *ServerInterfaceWrapper) GetBook(w http.ResponseWriter, r *http.Reques
 }
 
 // PutBook operation middleware
-func (siw *	ServerInterfaceWrapper) PutBook(w http.ResponseWriter, r *http.Request) {
+func (siw *ServerInterfaceWrapper) PutBook(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var err error
@@ -358,172 +358,6 @@ func (siw *ServerInterfaceWrapper) PutRecipe(w http.ResponseWriter, r *http.Requ
 
 	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PutRecipe(w, r, bookId, recipeId)
-	})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetSteps operation middleware
-func (siw *ServerInterfaceWrapper) GetSteps(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "bookId" -------------
-	var bookId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
-		return
-	}
-
-	// ------------- Path parameter "recipeId" -------------
-	var recipeId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
-		return
-	}
-
-	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetSteps(w, r, bookId, recipeId)
-	})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// PostStep operation middleware
-func (siw *ServerInterfaceWrapper) PostStep(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "bookId" -------------
-	var bookId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
-		return
-	}
-
-	// ------------- Path parameter "recipeId" -------------
-	var recipeId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
-		return
-	}
-
-	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PostStep(w, r, bookId, recipeId)
-	})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetStep operation middleware
-func (siw *ServerInterfaceWrapper) GetStep(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "bookId" -------------
-	var bookId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
-		return
-	}
-
-	// ------------- Path parameter "recipeId" -------------
-	var recipeId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
-		return
-	}
-
-	// ------------- Path parameter "stepId" -------------
-	var stepId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "stepId", runtime.ParamLocationPath, chi.URLParam(r, "stepId"), &stepId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "stepId", Err: err})
-		return
-	}
-
-	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetStep(w, r, bookId, recipeId, stepId)
-	})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// PutStep operation middleware
-func (siw *ServerInterfaceWrapper) PutStep(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "bookId" -------------
-	var bookId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
-		return
-	}
-
-	// ------------- Path parameter "recipeId" -------------
-	var recipeId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
-		return
-	}
-
-	// ------------- Path parameter "stepId" -------------
-	var stepId string
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "stepId", runtime.ParamLocationPath, chi.URLParam(r, "stepId"), &stepId)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "stepId", Err: err})
-		return
-	}
-
-	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PutStep(w, r, bookId, recipeId, stepId)
 	})
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -745,6 +579,172 @@ func (siw *ServerInterfaceWrapper) PutIngredient(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
+// GetSteps operation middleware
+func (siw *ServerInterfaceWrapper) GetSteps(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetSteps(w, r, bookId, recipeId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PostStep operation middleware
+func (siw *ServerInterfaceWrapper) PostStep(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostStep(w, r, bookId, recipeId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetStep operation middleware
+func (siw *ServerInterfaceWrapper) GetStep(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "stepId" -------------
+	var stepId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "stepId", runtime.ParamLocationPath, chi.URLParam(r, "stepId"), &stepId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "stepId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetStep(w, r, bookId, recipeId, stepId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PutStep operation middleware
+func (siw *ServerInterfaceWrapper) PutStep(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "bookId" -------------
+	var bookId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "bookId", runtime.ParamLocationPath, chi.URLParam(r, "bookId"), &bookId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bookId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "recipeId" -------------
+	var recipeId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "recipeId", runtime.ParamLocationPath, chi.URLParam(r, "recipeId"), &recipeId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "recipeId", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "stepId" -------------
+	var stepId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "stepId", runtime.ParamLocationPath, chi.URLParam(r, "stepId"), &stepId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "stepId", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PutStep(w, r, bookId, recipeId, stepId)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -758,16 +758,16 @@ func (e *UnescapedCookieParamError) Unwrap() error {
 	return e.Err
 }
 
-type UnmarshallingParamError struct {
+type UnmarshalingParamError struct {
 	ParamName string
 	Err       error
 }
 
-func (e *UnmarshallingParamError) Error() string {
-	return fmt.Sprintf("Error unmarshalling parameter %s as JSON: %s", e.ParamName, e.Err.Error())
+func (e *UnmarshalingParamError) Error() string {
+	return fmt.Sprintf("Error unmarshaling parameter %s as JSON: %s", e.ParamName, e.Err.Error())
 }
 
-func (e *UnmarshallingParamError) Unwrap() error {
+func (e *UnmarshalingParamError) Unwrap() error {
 	return e.Err
 }
 
@@ -859,61 +859,61 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/recipe-books", wrapper.GetRecipeBooks)
+		r.Get(options.BaseURL+"/books", wrapper.GetBooks)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/recipe-books", wrapper.PostRecipeBook)
+		r.Post(options.BaseURL+"/books", wrapper.PostBook)
 	})
 	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/recipe-books/{bookId}", wrapper.DeleteBook)
+		r.Delete(options.BaseURL+"/books/{bookId}", wrapper.DeleteBook)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/recipe-books/{bookId}", wrapper.GetBook)
+		r.Get(options.BaseURL+"/books/{bookId}", wrapper.GetBook)
 	})
 	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/recipe-books/{bookId}", wrapper.PutBook)
+		r.Put(options.BaseURL+"/books/{bookId}", wrapper.PutBook)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes", wrapper.GetRecipes)
+		r.Get(options.BaseURL+"/books/{bookId}/recipes", wrapper.GetRecipes)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/recipe-books/{bookId}/recipes", wrapper.PostRecipe)
+		r.Post(options.BaseURL+"/books/{bookId}/recipes", wrapper.PostRecipe)
 	})
 	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}", wrapper.DeleteRecipe)
+		r.Delete(options.BaseURL+"/books/{bookId}/recipes/{recipeId}", wrapper.DeleteRecipe)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}", wrapper.GetRecipe)
+		r.Get(options.BaseURL+"/books/{bookId}/recipes/{recipeId}", wrapper.GetRecipe)
 	})
 	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}", wrapper.PutRecipe)
+		r.Put(options.BaseURL+"/books/{bookId}/recipes/{recipeId}", wrapper.PutRecipe)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps", wrapper.GetSteps)
+		r.Get(options.BaseURL+"/books/{bookId}/recipes/{recipeId}/ingredients", wrapper.GetIngredients)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps", wrapper.PostStep)
+		r.Post(options.BaseURL+"/books/{bookId}/recipes/{recipeId}/ingredients", wrapper.PostIngredient)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId}", wrapper.GetStep)
+		r.Delete(options.BaseURL+"/books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}", wrapper.DeleteIngredient)
 	})
 	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId}", wrapper.PutStep)
+		r.Get(options.BaseURL+"/books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}", wrapper.GetIngredient)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/ingredients", wrapper.GetIngredients)
+		r.Put(options.BaseURL+"/books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}", wrapper.PutIngredient)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/ingredients", wrapper.PostIngredient)
+		r.Get(options.BaseURL+"/books/{bookId}/recipes/{recipeId}/steps", wrapper.GetSteps)
 	})
 	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}", wrapper.DeleteIngredient)
+		r.Post(options.BaseURL+"/books/{bookId}/recipes/{recipeId}/steps", wrapper.PostStep)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}", wrapper.GetIngredient)
+		r.Get(options.BaseURL+"/books/{bookId}/recipes/{recipeId}/steps/{stepId}", wrapper.GetStep)
 	})
 	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}", wrapper.PutIngredient)
+		r.Put(options.BaseURL+"/books/{bookId}/recipes/{recipeId}/steps/{stepId}", wrapper.PutStep)
 	})
 
 	return r

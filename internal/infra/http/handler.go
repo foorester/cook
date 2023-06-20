@@ -5,7 +5,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/foorester/cook/internal/domain/model"
+	"github.com/google/uuid"
+
 	"github.com/foorester/cook/internal/domain/service"
 	"github.com/foorester/cook/internal/infra/openapi"
 	"github.com/foorester/cook/internal/sys"
@@ -35,19 +36,41 @@ func NewCookHandler(opts ...sys.Option) *CookHandler {
 	}
 }
 
-func (h *CookHandler) GetRecipeBooks(w http.ResponseWriter, r *http.Request) {
+func (h *CookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 	//TODO not implemented yet
-	_, err := w.Write([]byte("GetRecipeBooks not implemented yet"))
+	_, err := w.Write([]byte("GetBooks not implemented yet"))
 	if err != nil {
 		h.Log().Error(err)
 	}
 }
 
-func (h *CookHandler) PostRecipeBook(w http.ResponseWriter, r *http.Request) {
-	//TODO not implemented yet
-	_, err := w.Write([]byte("PostRecipeBook not implemented yet"))
+func (h *CookHandler) PostBook(w http.ResponseWriter, r *http.Request) {
+	// Session
+	userID, err := h.User(r)
 	if err != nil {
-		h.Log().Error(err)
+		err = errors.Wrap("post book error", err)
+		h.handleError(w, err)
+	}
+
+	// Request to Transport
+	defer h.closeBody(r.Body)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		h.handleError(w, InvalidRequestErr)
+	}
+
+	var book service.CreateBookReq
+	err = json.Unmarshal(body, &book)
+	if err != nil {
+		h.handleError(w, InvalidRequestDataErr)
+	}
+
+	// Use service to save the model
+	ctx := r.Context()
+	err = h.Service().CreateBook(ctx, book, userID)
+	if err != nil {
+		err = errors.Wrap("post book error", err)
+		h.handleError(w, err)
 	}
 }
 
@@ -84,34 +107,10 @@ func (h *CookHandler) GetRecipes(w http.ResponseWriter, r *http.Request, bookId 
 }
 
 func (h *CookHandler) PostRecipe(w http.ResponseWriter, r *http.Request, bookId string) {
-	// Request to model
-	// Here for now but will be wrapped in am externalized function
-	var recipe model.Recipe
-	defer func() {
-		if err := r.Body.Close(); err != nil {
-			// Handle the error here, such as logging or returning an error response.
-		}
-	}()
-
-	err := json.NewDecoder(r.Body).Decode(&recipe)
+	//TODO not implemented yet
+	_, err := w.Write([]byte("PostRecipe not implemented yet"))
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		_, err = w.Write([]byte(InvalidJSONBodyErr.Error()))
-		if err != nil {
-			h.Log().Errorf("post recipe error: %w", err)
-		}
-		return
-	}
-
-	defer h.closeBody(r.Body)
-
-	// Basic validation
-
-	// Use service to save the model
-	ctx := r.Context()
-	err = h.Service().CreateRecipe(ctx, recipe)
-	if err != nil {
-
+		h.Log().Error(err)
 	}
 }
 
@@ -212,6 +211,19 @@ func (h *CookHandler) PutIngredient(w http.ResponseWriter, r *http.Request, book
 }
 
 // Helpers
+
+func (h *CookHandler) User(r *http.Request) (userID string, err error) {
+	// Authentication mechanism not yet established.
+	// WIP: A hardcoded value is returned for now.
+	uid := "c4c109ad-f178-400a-b86d-3b0d548d852c"
+
+	_, err = uuid.Parse(uid)
+	if err != nil {
+		return "", NoUserErr
+	}
+
+	return uid, nil
+}
 
 // closeBody close the body and log errors if happened.
 func (h *CookHandler) closeBody(body io.ReadCloser) {
