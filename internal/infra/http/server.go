@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5/middleware"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/foorester/cook/internal/infra/openapi"
@@ -36,6 +37,12 @@ func NewServer(opts ...sys.Option) (server *Server) {
 
 func (srv *Server) Setup(ctx context.Context) {
 	h := NewCookHandler(srv.opts...)
+
+	srv.router.Use(middleware.RequestID)
+	srv.router.Use(middleware.RealIP)
+	srv.router.Use(middleware.Logger)
+	srv.router.Use(middleware.Recoverer)
+
 	srv.router.Mount(apiV1PAth, openapi.Handler(h))
 }
 

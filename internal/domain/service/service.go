@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"github.com/foorester/cook/internal/domain"
 	"github.com/foorester/cook/internal/domain/port"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/errors"
@@ -13,8 +12,8 @@ type (
 	RecipeService interface {
 		sys.Core
 		Repo() port.CookRepo
-		CreateBook(ctx context.Context, m CreateBookReq, userID string) error
-		CreateRecipe(ctx context.Context, m CreateRecipeReq) error
+		CreateBook(ctx context.Context, m CreateBookReq) CreateBookRes
+		CreateRecipe(ctx context.Context, m CreateRecipeReq) CreateRecipeRes
 	}
 
 	Recipe struct {
@@ -36,21 +35,23 @@ func NewService(rr port.CookRepo, opts ...sys.Option) *Recipe {
 	}
 }
 
-func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq, userID string) (errSet core.ValErrorSet, err error) {
+func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq) (res CreateBookRes) {
 	// Transport to Model
 	book := req.ToBook()
 
 	// Validate model
 	v := NewBookValidator(book)
 
-	err = v.ValidateForCreate()
+	err := v.ValidateForCreate()
 	if err != nil {
-		return v.Errors, err
+		return NewCreateBookRes(v.Errors, err, rs.Cfg())
 	}
 
-	user, err := rs.Repo().GetUser(ctx, userID)
+	// Set Owner
+	user, err := rs.Repo().GetUser(ctx, req.UserID)
 	if err != nil {
-		return errSet, errors.Wrap("create book error", err)
+		err = errors.Wrap("create book error", err)
+		return NewCreateBookRes(nil, err, rs.Cfg())
 	}
 
 	book.Owner = user
@@ -58,33 +59,35 @@ func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq, userID stri
 	// Persist it
 	err = rs.Repo().CreateBook(ctx, book)
 	if err != nil {
-		return errSet, errors.Wrap("error creating recipe book", err)
+		err = errors.Wrap("create book error", err)
+		return NewCreateBookRes(nil, err, rs.Cfg())
 	}
 
-	// Send a message to bus
-	return errSet, nil
+	return NewCreateBookRes(nil, nil, nil)
 }
 
-func (rs *Recipe) CreateRecipe(ctx context.Context, req CreateRecipeReq) (errSet core.ValErrorSet, err error) {
+func (rs *Recipe) CreateRecipe(ctx context.Context, req CreateRecipeReq, userID string) (res CreateRecipeRes) {
 	// Transport to Model
 	recipe := req.ToRecipe()
 
 	// Validate model
 	v := NewRecipeValidator(recipe)
 
-	err = v.ValidateForCreate()
+	err := v.ValidateForCreate()
 	if err != nil {
-		return v.Errors, err
+		return NewCreateRecipeRes(v.Errors, err, rs.Cfg())
 	}
 
 	// Persist it
 	err = rs.Repo().CreateRecipe(ctx, recipe)
 	if err != nil {
-		return errSet, errors.Wrap("error creating recipe", err)
+		err = errors.Wrap("create recipe error", err)
+		return NewCreateRecipeRes(nil, err, rs.Cfg())
 	}
 
 	// Send a message to bus
-	return errSet, nil
+
+	return NewCreateRecipeRes(nil, nil, nil)
 }
 
 func (rs *Recipe) Repo() port.CookRepo {
