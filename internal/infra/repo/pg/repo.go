@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
 
@@ -75,4 +76,26 @@ func pgxConn(db db.DB) (conn *pgx.Conn, ok bool) {
 	}
 
 	return conn, true
+}
+
+func (cr *CookRepo) GetUser(ctx context.Context, userID string) (user model.User, err error) {
+	// WIP: Mock implementation
+	ref := "c4c109ad-f178-400a-b86d-3b0d548d852c"
+
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return user, InvalidResourceIDErr
+	}
+
+	if userID == ref {
+		return model.User{
+			ID:       uid,
+			Username: "johndoe",
+			Name:     "John Doe",
+			Email:    "john.doe@localhost.com",
+		}, nil
+
+	}
+
+	return user, UserNotFoundErr
 }

@@ -16,5 +16,6 @@ type (
 		Repo
 		CreateBook(ctx context.Context, recipe model.Book) error
 		CreateRecipe(ctx context.Context, recipe model.Recipe) error
+		GetUser(ctx context.Context, userID string) (user model.User, err error)
 	}
 )

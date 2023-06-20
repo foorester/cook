@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/foorester/cook/internal/domain"
-	"github.com/foorester/cook/internal/domain/model"
 	"github.com/foorester/cook/internal/domain/port"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/errors"
@@ -14,8 +13,8 @@ type (
 	RecipeService interface {
 		sys.Core
 		Repo() port.CookRepo
-		CreateBook(ctx context.Context, r model.Book) error
-		CreateRecipe(ctx context.Context, r model.Recipe) error
+		CreateBook(ctx context.Context, m CreateBookReq, userID string) error
+		CreateRecipe(ctx context.Context, m CreateRecipeReq) error
 	}
 
 	Recipe struct {
@@ -37,7 +36,7 @@ func NewService(rr port.CookRepo, opts ...sys.Option) *Recipe {
 	}
 }
 
-func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq) (errSet core.ValErrorSet, err error) {
+func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq, userID string) (errSet core.ValErrorSet, err error) {
 	// Transport to Model
 	book := req.ToBook()
 
@@ -48,6 +47,13 @@ func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq) (errSet cor
 	if err != nil {
 		return v.Errors, err
 	}
+
+	user, err := rs.Repo().GetUser(ctx, userID)
+	if err != nil {
+		return errSet, errors.Wrap("create book error", err)
+	}
+
+	book.Owner = user
 
 	// Persist it
 	err = rs.Repo().CreateBook(ctx, book)

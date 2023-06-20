@@ -14,34 +14,34 @@ servers:
 security:
   - bearerAuth: []
 paths:
-  /recipe-books:
+  /books:
     get:
-      summary: Retrieve all recipe books
+      summary: Retrieve all books
       responses:
         '200':
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RecipeBookList'
+                $ref: '#/components/schemas/BookList'
     post:
-      summary: Create a new recipe book
+      summary: Create a new book
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RecipeBook'
+              $ref: '#/components/schemas/Book'
       responses:
         '201':
-          description: Recipe book created
+          description: Book created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RecipeBook'
-  /recipe-books/{bookId}:
+                $ref: '#/components/schemas/Book'
+  /books/{bookId}:
     get:
-      summary: Retrieve a specific recipe book
+      summary: Retrieve a specific book
       parameters:
         - in: path
           name: bookId
@@ -54,9 +54,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RecipeBook'
+                $ref: '#/components/schemas/Book'
     put:
-      summary: Update a specific recipe book
+      summary: Update a specific book
       parameters:
         - in: path
           name: bookId
@@ -68,16 +68,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RecipeBook'
+              $ref: '#/components/schemas/Book'
       responses:
         '200':
-          description: Recipe book updated
+          description: Book updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RecipeBook'
+                $ref: '#/components/schemas/Book'
     delete:
-      summary: Delete a specific recipe book
+      summary: Delete a specific book
       parameters:
         - in: path
           name: bookId
@@ -86,10 +86,10 @@ paths:
             type: string
       responses:
         '204':
-          description: Recipe book deleted
-  /recipe-books/{bookId}/recipes:
+          description: Book deleted
+  /books/{bookId}/recipes:
     get:
-      summary: Retrieve all recipes in a recipe book
+      summary: Retrieve all recipes in a book
       parameters:
         - in: path
           name: bookId
@@ -104,7 +104,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RecipeList'
     post:
-      summary: Create a new recipe in a recipe book
+      summary: Create a new recipe in a book
       parameters:
         - in: path
           name: bookId
@@ -124,9 +124,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Recipe'
-  /recipe-books/{bookId}/recipes/{recipeId}:
+  /books/{bookId}/recipes/{recipeId}:
     get:
-      summary: Retrieve a specific recipe in a recipe book
+      summary: Retrieve a specific recipe in a book
       parameters:
         - in: path
           name: bookId
@@ -146,7 +146,7 @@ paths:
                   schema:
                     $ref: '#/components/schemas/Recipe'
     put:
-      summary: Update a specific recipe in a recipe book
+      summary: Update a specific recipe in a book
       parameters:
         - in: path
           name: bookId
@@ -172,7 +172,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Recipe'
     delete:
-      summary: Delete a specific recipe in a recipe book
+      summary: Delete a specific recipe in a book
       parameters:
         - in: path
           name: bookId
@@ -187,7 +187,7 @@ paths:
       responses:
         '204':
           description: Recipe deleted
-  /recipe-books/{bookId}/recipes/{recipeId}/ingredients:
+  /books/{bookId}/recipes/{recipeId}/ingredients:
     get:
       summary: Retrieve all ingredients in a recipe
       parameters:
@@ -234,7 +234,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ingredient'
-  /recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}:
+  /books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}:
     get:
       summary: Retrieve a specific ingredient in a recipe
       parameters:
@@ -312,9 +312,9 @@ paths:
       responses:
         '204':
           description: Ingredient deleted
-  /recipe-books/{bookId}/recipes/{recipeId}/direction-steps:
+  /books/{bookId}/recipes/{recipeId}/steps:
     get:
-      summary: Retrieve all direction steps in a recipe
+      summary: Retrieve all steps in a recipe
       parameters:
         - in: path
           name: bookId
@@ -334,7 +334,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StepList'
     post:
-      summary: Create a new direction step in a recipe
+      summary: Create a new step in a recipe
       parameters:
         - in: path
           name: bookId
@@ -359,9 +359,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Step'
-  /recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId}:
+  /books/{bookId}/recipes/{recipeId}/steps/{stepId}:
     get:
-      summary: Retrieve a specific direction step in a recipe
+      summary: Retrieve a specific step in a recipe
       parameters:
         - in: path
           name: bookId
@@ -386,7 +386,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Step'
     put:
-      summary: Update a specific direction step in a recipe
+      summary: Update a specific step in a recipe
       parameters:
         - in: path
           name: bookId
@@ -411,13 +411,13 @@ paths:
               $ref: '#/components/schemas/Step'
       responses:
         '200':
-          description: Direction Step updated
+          description: Step updated
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Step'
         delete:
-          summary: Delete a specific direction step in a recipe
+          summary: Delete a specific step in a recipe
           parameters:
             - in: path
               name: bookId
@@ -439,7 +439,7 @@ paths:
               description: Direction step deleted
 components:
   schemas:
-    RecipeBook:
+    Book:
       type: object
       properties:
         id:
@@ -477,10 +477,10 @@ components:
           type: string
         step:
           type: string
-    RecipeBookList:
+    BookList:
       type: array
       items:
-        $ref: '#/components/schemas/RecipeBook'
+        $ref: '#/components/schemas/Book'
     RecipeList:
       type: array
       items:

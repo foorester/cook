@@ -7,6 +7,15 @@ import (
 )
 
 type (
+	User struct {
+		ID       uuid.UUID
+		Username string
+		Name     string
+		Email    string
+	}
+)
+
+type (
 	GetBooksReq struct {
 	}
 
