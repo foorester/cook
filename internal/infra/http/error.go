@@ -22,5 +22,7 @@ var (
 	NoAssetReqErr         = errors.NewError("no asset request provided")
 	InvalidRequestErr     = errors.NewError("invalid request")
 	InvalidRequestDataErr = errors.NewError("invalid request data")
-	InvalidJSONBodyErr    = NewError("invalid JSON body")
+	InvalidJSONBodyErr    = errors.NewError("invalid JSON body")
+	InvalidValueTypeErr   = errors.NewError("invalid value type")
+	BookNotFoundErr       = errors.NewError("book not found")
 )

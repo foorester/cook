@@ -64,11 +64,12 @@ func (h *CookHandler) PostBook(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.handleError(w, InvalidRequestDataErr)
 	}
+	book.UserID = userID
 
 	// Use service to save the model
 	ctx := r.Context()
-	err = h.Service().CreateBook(ctx, book, userID)
-	if err != nil {
+	res := h.Service().CreateBook(ctx, book)
+	if err = res.Err(); err != nil {
 		err = errors.Wrap("post book error", err)
 		h.handleError(w, err)
 	}
@@ -106,11 +107,35 @@ func (h *CookHandler) GetRecipes(w http.ResponseWriter, r *http.Request, bookId 
 	}
 }
 
-func (h *CookHandler) PostRecipe(w http.ResponseWriter, r *http.Request, bookId string) {
-	//TODO not implemented yet
-	_, err := w.Write([]byte("PostRecipe not implemented yet"))
+func (h *CookHandler) PostRecipe(w http.ResponseWriter, r *http.Request, bookID string) {
+	// Session
+	userID, err := h.User(r)
 	if err != nil {
-		h.Log().Error(err)
+		err = errors.Wrap("post book error", err)
+		h.handleError(w, err)
+	}
+
+	// Request to Transport
+	defer h.closeBody(r.Body)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		h.handleError(w, InvalidRequestErr)
+	}
+
+	var recipe service.CreateRecipeReq
+	err = json.Unmarshal(body, &recipe)
+	if err != nil {
+		h.handleError(w, InvalidRequestDataErr)
+	}
+	recipe.UserID = userID
+	recipe.BookID = bookID
+
+	// Use service to save the model
+	ctx := r.Context()
+	res := h.Service().CreateRecipe(ctx, recipe)
+	if err = res.Err(); err != nil {
+		err = errors.Wrap("post book error", err)
+		h.handleError(w, err)
 	}
 }
 
@@ -223,6 +248,23 @@ func (h *CookHandler) User(r *http.Request) (userID string, err error) {
 	}
 
 	return uid, nil
+}
+
+// Book returns the book ID from request context.
+// Chi router + OpenAPI makes this unnecessary but can be useful when using
+// stdlib or a Chi router custom middleware.
+func (h *CookHandler) Book(r *http.Request) (bookID string, err error) {
+	val := r.Context().Value(BookCtxKey)
+	if val != nil {
+		switch v := val.(type) {
+		case string:
+			return v, nil
+		default:
+			return bookID, InvalidValueTypeErr
+		}
+	}
+
+	return bookID, BookNotFoundErr
 }
 
 // closeBody close the body and log errors if happened.

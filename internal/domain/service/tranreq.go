@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	User struct {
+	UserReq struct {
 		ID       uuid.UUID
 		Username string
 		Name     string
@@ -28,11 +28,10 @@ type (
 
 type (
 	CreateBookReq struct {
+		UserID      string
 		Name        string
 		Description string
 	}
-
-	CreateBookRes struct{}
 )
 
 func (req CreateBookReq) ToBook() model.Book {
@@ -48,8 +47,6 @@ type (
 	DeleteBookReq struct {
 		ID string
 	}
-
-	DeleteBookRes struct{}
 )
 
 // DeleteBookReq validation logic
@@ -72,9 +69,6 @@ type (
 		ID   string
 		Name string
 	}
-
-	UpdateBookRes struct {
-	}
 )
 
 // UpdateBookReq validation logic
@@ -93,15 +87,17 @@ type (
 
 type (
 	CreateRecipeReq struct {
-		Name string
+		UserID      string
+		Name        string
+		Description string
+		BookID      string
 	}
-
-	CreateRecipeRes struct{}
 )
 
 func (req CreateRecipeReq) ToRecipe() model.Recipe {
 	return model.Recipe{
-		Name: req.Name,
+		Name:        req.Name,
+		Description: req.Description,
 	}
 }
 
@@ -111,8 +107,6 @@ type (
 	DeleteRecipeReq struct {
 		ID string
 	}
-
-	DeleteRecipeRes struct{}
 )
 
 // DeleteReq validation logic
@@ -137,9 +131,6 @@ type (
 		ID   string
 		Name string
 	}
-
-	UpdateRecipeRes struct {
-	}
 )
 
 // UpdateRecipeReq validation logic
@@ -162,8 +153,6 @@ type (
 		Description string
 		Duration    string
 	}
-
-	CreateDirectionStepRes struct{}
 )
 
 // CreateDirectionStepReq validation logic
@@ -189,9 +178,6 @@ type (
 		Description string
 		Duration    string
 	}
-
-	UpdateDirectionStepRes struct {
-	}
 )
 
 // UpdateDirectionStepReq validation logic
@@ -215,8 +201,6 @@ type (
 		Quantity    string
 		Unit        string
 	}
-
-	CreateIngredientRes struct{}
 )
 
 // CreateIngredientReq validation logic
@@ -225,8 +209,6 @@ type (
 	DeleteIngredientReq struct {
 		ID string
 	}
-
-	DeleteIngredientRes struct{}
 )
 
 // DeleteIngredientReq validation logic
@@ -253,9 +235,6 @@ type (
 		Description string
 		Quantity    string
 		Unit        string
-	}
-
-	UpdateIngredientRes struct {
 	}
 )
 
