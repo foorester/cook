@@ -50,6 +50,7 @@ func NewServiceRes(valErrSet core.ValErrorSet, err error, cfg *config.Config) Se
 type (
 	CreateBookRes struct {
 		ServiceRes
+		ID string
 	}
 )
 
@@ -62,6 +63,7 @@ func NewCreateBookRes(valErrSet core.ValErrorSet, err error, cfg *config.Config)
 type (
 	CreateRecipeRes struct {
 		ServiceRes
+		ID string
 	}
 )
 

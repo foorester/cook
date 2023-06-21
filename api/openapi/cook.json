@@ -25,7 +25,7 @@
     }
   ],
   "paths": {
-    "/recipe-books": {
+    "/books": {
       "get": {
         "summary": "Retrieve all recipe books",
         "responses": {
@@ -34,7 +34,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecipeBookList"
+                  "$ref": "#/components/schemas/BookList"
                 }
               }
             }
@@ -48,7 +48,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RecipeBook"
+                "$ref": "#/components/schemas/Book"
               }
             }
           }
@@ -59,7 +59,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecipeBook"
+                  "$ref": "#/components/schemas/Book"
                 }
               }
             }
@@ -67,7 +67,7 @@
         }
       }
     },
-    "/recipe-books/{bookId}": {
+    "/books/{bookId}": {
       "get": {
         "summary": "Retrieve a specific recipe book",
         "parameters": [
@@ -86,7 +86,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecipeBook"
+                  "$ref": "#/components/schemas/Book"
                 }
               }
             }
@@ -110,7 +110,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RecipeBook"
+                "$ref": "#/components/schemas/Book"
               }
             }
           }
@@ -121,7 +121,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecipeBook"
+                  "$ref": "#/components/schemas/Book"
                 }
               }
             }
@@ -147,7 +147,7 @@
         }
       }
     },
-    "/recipe-books/{bookId}/recipes": {
+    "/books/{bookId}/recipes": {
       "get": {
         "summary": "Retrieve all recipes in a recipe book",
         "parameters": [
@@ -209,7 +209,7 @@
         }
       }
     },
-    "/recipe-books/{bookId}/recipes/{recipeId}": {
+    "/books/{bookId}/recipes/{recipeId}": {
       "get": {
         "summary": "Retrieve a specific recipe in a recipe book",
         "parameters": [
@@ -313,7 +313,7 @@
         }
       }
     },
-    "/recipe-books/{bookId}/recipes/{recipeId}/ingredients": {
+    "/books/{bookId}/recipes/{recipeId}/ingredients": {
       "get": {
         "summary": "Retrieve all ingredients in a recipe",
         "parameters": [
@@ -391,7 +391,7 @@
         }
       }
     },
-    "/recipe-books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}": {
+    "/books/{bookId}/recipes/{recipeId}/ingredients/{ingredientId}": {
       "get": {
         "summary": "Retrieve a specific ingredient in a recipe",
         "parameters": [
@@ -519,9 +519,9 @@
         }
       }
     },
-    "/recipe-books/{bookId}/recipes/{recipeId}/direction-steps": {
+    "/books/{bookId}/recipes/{recipeId}/steps": {
       "get": {
-        "summary": "Retrieve all direction steps in a recipe",
+        "summary": "Retrieve all steps in a recipe",
         "parameters": [
           {
             "in": "path",
@@ -554,7 +554,7 @@
         }
       },
       "post": {
-        "summary": "Create a new direction step in a recipe",
+        "summary": "Create a new step in a recipe",
         "parameters": [
           {
             "in": "path",
@@ -597,9 +597,9 @@
         }
       }
     },
-    "/recipe-books/{bookId}/recipes/{recipeId}/direction-steps/{stepId}": {
+    "/books/{bookId}/recipes/{recipeId}/steps/{stepId}": {
       "get": {
-        "summary": "Retrieve a specific direction step in a recipe",
+        "summary": "Retrieve a specific step in a recipe",
         "parameters": [
           {
             "in": "path",
@@ -640,7 +640,7 @@
         }
       },
       "put": {
-        "summary": "Update a specific direction step in a recipe",
+        "summary": "Update a specific step in a recipe",
         "parameters": [
           {
             "in": "path",
@@ -689,7 +689,7 @@
             }
           },
           "delete": {
-            "summary": "Delete a specific direction step in a recipe",
+            "summary": "Delete a specific step in a recipe",
             "parameters": [
               {
                 "in": "path",
@@ -728,7 +728,7 @@
   },
   "components": {
     "schemas": {
-      "RecipeBook": {
+      "Book": {
         "type": "object",
         "properties": {
           "id": {
@@ -787,10 +787,10 @@
           }
         }
       },
-      "RecipeBookList": {
+      "BookList": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/RecipeBook"
+          "$ref": "#/components/schemas/Book"
         }
       },
       "RecipeList": {

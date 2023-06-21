@@ -9,7 +9,7 @@ import (
 )
 
 func toInsertBookParams(b model.Book) (p InsertBookParams, err error) {
-	bookID, ok := toPgUUID(b.ID)
+	bookID, ok := toPgUUID(b.ID.Val())
 	if !ok {
 		return p, errors.Wrap("invalid book ID", InvalidResourceIDErr)
 	}
