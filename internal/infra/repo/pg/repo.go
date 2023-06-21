@@ -51,6 +51,8 @@ func (cr *CookRepo) Start(ctx context.Context) error {
 }
 
 func (cr *CookRepo) CreateBook(ctx context.Context, b model.Book) (err error) {
+	b.GenID()
+
 	args, err := toInsertBookParams(b)
 	if err != nil {
 		return errors.Wrap("create book err", err)
