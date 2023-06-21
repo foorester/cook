@@ -66,7 +66,7 @@ func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq) (res Create
 	return NewCreateBookRes(nil, nil, nil)
 }
 
-func (rs *Recipe) CreateRecipe(ctx context.Context, req CreateRecipeReq, userID string) (res CreateRecipeRes) {
+func (rs *Recipe) CreateRecipe(ctx context.Context, req CreateRecipeReq) (res CreateRecipeRes) {
 	// Transport to Model
 	recipe := req.ToRecipe()
 

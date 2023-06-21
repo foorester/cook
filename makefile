@@ -23,3 +23,17 @@ openapihttp:
 .PHONY: gensqlcpg
 gensqlcpg:
 	sqlc generate -f ./configs/sqlc/pg.sqlc.yaml
+
+
+.PHONY: pgall
+pgall:
+	# Merge all migrations into one single file and move it to `/tmp`
+	# Execute make command with sudo
+	# psql: `\i /tmp/pgall.sql`
+	cat /home/adrian/Projects/labs/foorester/cook/scripts/sql/pg/migrations/*.sql > pgall.sql
+	mv pgall.sql /tmp
+
+# CURL
+.PHONY: create-book
+create-book:
+	./scripts/curl/create_book.sh -h localhost -p 8080 -n "Recipe Book One" -d "Favorite Recipes"

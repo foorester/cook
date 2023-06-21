@@ -1,10 +1,8 @@
 package model
 
-import "github.com/google/uuid"
-
 type (
 	Book struct {
-		ID          uuid.UUID
+		ID
 		Name        string
 		Description string
 		Owner       User
