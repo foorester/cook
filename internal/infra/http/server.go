@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/foorester/cook/internal/domain/service"
 	"github.com/foorester/cook/internal/infra/openapi"
 	"github.com/foorester/cook/internal/sys"
 )
@@ -19,6 +20,7 @@ type (
 		opts []sys.Option
 		http.Server
 		router Router
+		svc    service.RecipeService
 	}
 )
 
@@ -27,20 +29,23 @@ var (
 	apiV1PAth      = "/api/v1"
 )
 
-func NewServer(opts ...sys.Option) (server *Server) {
+func NewServer(svc service.RecipeService, opts ...sys.Option) (server *Server) {
 	return &Server{
 		Core:   sys.NewCore(httpServerName, opts...),
 		opts:   opts,
 		router: NewRouter("root-router", opts...),
+		svc:    svc,
 	}
 }
 
 func (srv *Server) Setup(ctx context.Context) {
-	h := NewCookHandler(srv.opts...)
+	h := NewCookHandler(srv.svc, srv.opts...)
+
+	reqLog := NewReqLoggerMW(srv.Log())
 
 	srv.router.Use(middleware.RequestID)
 	srv.router.Use(middleware.RealIP)
-	srv.router.Use(middleware.Logger)
+	srv.router.Use(reqLog)
 	srv.router.Use(middleware.Recoverer)
 
 	srv.router.Mount(apiV1PAth, openapi.Handler(h))

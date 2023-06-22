@@ -6,9 +6,9 @@ import (
 	"sync"
 
 	"github.com/foorester/cook/internal/domain/service"
-	"github.com/foorester/cook/internal/infra/db/pg"
+	"github.com/foorester/cook/internal/infra/db/pgx"
 	http2 "github.com/foorester/cook/internal/infra/http"
-	pgr "github.com/foorester/cook/internal/infra/repo/pg"
+	pgxr "github.com/foorester/cook/internal/infra/repo/pgx"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/config"
 	"github.com/foorester/cook/internal/sys/errors"
@@ -21,6 +21,7 @@ type App struct {
 	opts       []sys.Option
 	supervisor sys.Supervisor
 	http       *http2.Server
+	svc        service.RecipeService
 }
 
 func NewApp(name, namespace string, log log.Logger) (app *App) {
@@ -54,19 +55,19 @@ func (app *App) Setup(ctx context.Context) error {
 	app.EnableSupervisor()
 
 	// Databases
-	database := pg.NewDB(app.opts...)
+	database := pgx.NewDB(app.opts...)
 
 	// Repos
-	repo, err := pgr.NewCookRepo(database, app.opts...)
+	repo, err := pgxr.NewCookRepo(database, app.opts...)
 	if err != nil {
 		return err
 	}
 
 	// Services
-	svc := service.NewService(repo, app.opts...)
+	app.svc = service.NewService(repo, app.opts...)
 
 	// HTTP Server
-	app.http = http2.NewServer(app.opts...)
+	app.http = http2.NewServer(app.svc, app.opts...)
 	app.SetupRoutes(ctx)
 	app.SetupProbes(ctx)
 
@@ -76,7 +77,7 @@ func (app *App) Setup(ctx context.Context) error {
 
 	// WIP: to avoid unused var message
 	app.Log().Debugf("Repo: %v", repo)
-	app.Log().Debugf("Service: %v", svc)
+	app.Log().Debugf("Service: %v", app.svc)
 
 	return nil
 }
@@ -84,6 +85,11 @@ func (app *App) Setup(ctx context.Context) error {
 func (app *App) Start(ctx context.Context) error {
 	app.Log().Infof("%s starting...", app.Name())
 	defer app.Log().Infof("%s stopped", app.Name())
+
+	err := app.svc.Start(ctx)
+	if err != nil {
+		return errors.Wrap("app start error", err)
+	}
 
 	app.supervisor.AddTasks(
 		app.http.Start,
