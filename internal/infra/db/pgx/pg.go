@@ -1,10 +1,11 @@
-package pg
+package pgx
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/foorester/cook/internal/infra/db"
@@ -16,14 +17,14 @@ import (
 type (
 	DB struct {
 		sys.Core
-		db *db.DB
-		db.UnimplementedPGX
+		pool *pgxpool.Pool
+		db.UnimplementedSQL
 		db.UnimplementedNoSQL
 	}
 )
 
 const (
-	name = "pg-db"
+	name = "pgx-db"
 )
 
 func NewDB(opts ...sys.Option) *DB {
@@ -36,14 +37,14 @@ func (db *DB) Start(ctx context.Context) error {
 	return db.Connect(ctx)
 }
 
-func (db *DB) Connect(ctx context.Context) error {
-	pgDB, err := sql.Open("postgres", db.connString())
+func (db *DB) Connect(ctx context.Context) (err error) {
+	db.pool, err = pgxpool.New(ctx, db.connString())
 	if err != nil {
 		msg := fmt.Sprintf("%s connection error", db.Name())
 		return errors.Wrap(msg, err)
 	}
 
-	err = pgDB.Ping()
+	err = db.pool.Ping(ctx)
 	if err != nil {
 		msg := fmt.Sprintf("%s ping connection error", db.Name())
 		return errors.Wrap(msg, err)
@@ -53,8 +54,17 @@ func (db *DB) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (db *DB) DBConn(ctx context.Context) (sqlDB *db.DB, err error) {
-	return db.db, nil
+func (db *DB) Conn(ctx context.Context) (conn *pgx.Conn, err error) {
+	return db.PGXConn(ctx)
+}
+
+func (db *DB) PGXConn(ctx context.Context) (conn *pgx.Conn, err error) {
+	poolConn, err := db.pool.Acquire(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to acquire connection from pool: %w", err)
+	}
+
+	return poolConn.Conn(), nil
 }
 
 func (db *DB) connString() (connString string) {
@@ -68,6 +78,7 @@ func (db *DB) connString() (connString string) {
 	sslMode := cfg.GetBool("db.pg.sslmode")
 
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d search_path=%s", user, pass, name, host, port, schema)
+	db.Log().Infof(connStr)
 
 	if sslMode {
 		connStr = connStr + " sslmode=disable"

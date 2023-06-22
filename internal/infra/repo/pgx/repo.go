@@ -2,7 +2,6 @@ package pg
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -27,27 +26,24 @@ const (
 )
 
 func NewCookRepo(db db.DB, opts ...sys.Option) (cr *CookRepo, err error) {
-	pgConn, ok := pgxConn(db)
-	if !ok {
-		err = errors.Wrap("new cook repo", NoConnectionError)
-		return nil, err
-	}
-
 	return &CookRepo{
 		SimpleCore: sys.NewCore(name, opts...),
 		db:         db,
-		queries:    New(pgConn),
 	}, nil
 }
 
-func (cr *CookRepo) Start(ctx context.Context) error {
-	err := cr.db.Start(ctx)
+func (cr *CookRepo) Setup(ctx context.Context) (err error) {
+	err = cr.db.Connect(ctx)
 	if err != nil {
-		msg := fmt.Sprintf("%s setup error", err)
-		return errors.Wrap(msg, err)
+		err = errors.Wrap("cook repo setup error", err)
+		return err
 	}
 
 	return nil
+}
+
+func (cr *CookRepo) DB(ctx context.Context) (db db.DB) {
+	return cr.db
 }
 
 func (cr *CookRepo) CreateBook(ctx context.Context, b model.Book) (err error) {
@@ -58,7 +54,13 @@ func (cr *CookRepo) CreateBook(ctx context.Context, b model.Book) (err error) {
 		return errors.Wrap("create book err", err)
 	}
 
-	_, err = cr.queries.InsertBook(ctx, args)
+	conn, err := cr.Conn(ctx)
+	if err != nil {
+		return errors.Wrap("create book err", err)
+	}
+
+	queries := NewQueries(conn)
+	_, err = queries.InsertBook(ctx, args)
 
 	return err
 }
@@ -67,17 +69,8 @@ func (cr *CookRepo) CreateRecipe(ctx context.Context, r model.Recipe) (err error
 	return errors.NewError("not implemented yet")
 }
 
-func (cr *CookRepo) DB() (db any) {
-	return cr.db.DB()
-}
-
-func pgxConn(db db.DB) (conn *pgx.Conn, ok bool) {
-	conn, ok = db.DB().(*pgx.Conn)
-	if !ok {
-		return conn, false
-	}
-
-	return conn, true
+func (cr *CookRepo) Conn(ctx context.Context) (*pgx.Conn, error) {
+	return cr.db.PGXConn(ctx)
 }
 
 func (cr *CookRepo) GetUser(ctx context.Context, userID string) (user model.User, err error) {

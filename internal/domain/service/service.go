@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/foorester/cook/internal/domain/port"
 	"github.com/foorester/cook/internal/sys"
@@ -11,7 +12,6 @@ import (
 type (
 	RecipeService interface {
 		sys.Core
-		Repo() port.CookRepo
 		CreateBook(ctx context.Context, m CreateBookReq) CreateBookRes
 		CreateRecipe(ctx context.Context, m CreateRecipeReq) CreateRecipeRes
 	}
@@ -92,4 +92,16 @@ func (rs *Recipe) CreateRecipe(ctx context.Context, req CreateRecipeReq) (res Cr
 
 func (rs *Recipe) Repo() port.CookRepo {
 	return rs.repo
+}
+
+func (rs *Recipe) Start(ctx context.Context) error {
+	db := rs.repo.DB(ctx)
+
+	err := db.Start(ctx)
+	if err != nil {
+		msg := fmt.Sprintf("%s start error", rs.Name())
+		return errors.Wrap(msg, err)
+	}
+
+	return nil
 }
