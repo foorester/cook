@@ -22,7 +22,7 @@ type (
 
 	CookHandler struct {
 		*sys.SimpleCore
-		service service.RecipeService
+		svc service.RecipeService
 	}
 )
 
@@ -30,9 +30,10 @@ const (
 	cookHandlerName = "cook-handler"
 )
 
-func NewCookHandler(opts ...sys.Option) *CookHandler {
+func NewCookHandler(svc service.RecipeService, opts ...sys.Option) *CookHandler {
 	return &CookHandler{
 		SimpleCore: sys.NewCore(cookHandlerName, opts...),
+		svc:        svc,
 	}
 }
 
@@ -66,7 +67,7 @@ func (h *CookHandler) PostBook(w http.ResponseWriter, r *http.Request) {
 	}
 	book.UserID = userID
 
-	// Use service to save the model
+	// Use svc to save the model
 	ctx := r.Context()
 	res := h.Service().CreateBook(ctx, book)
 	if err = res.Err(); err != nil {
@@ -130,7 +131,7 @@ func (h *CookHandler) PostRecipe(w http.ResponseWriter, r *http.Request, bookID 
 	recipe.UserID = userID
 	recipe.BookID = bookID
 
-	// Use service to save the model
+	// Use svc to save the model
 	ctx := r.Context()
 	res := h.Service().CreateRecipe(ctx, recipe)
 	if err = res.Err(); err != nil {
@@ -276,7 +277,7 @@ func (h *CookHandler) closeBody(body io.ReadCloser) {
 
 // Handler interface
 
-// Service returns a recipe service implementation.
+// Service returns a recipe svc implementation.
 func (h *CookHandler) Service() service.RecipeService {
-	return h.service
+	return h.svc
 }
