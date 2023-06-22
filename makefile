@@ -30,10 +30,11 @@ pgall:
 	# Merge all migrations into one single file and move it to `/tmp`
 	# Execute make command with sudo
 	# psql: `\i /tmp/pgall.sql`
+	# WIP: Later a migrator will take care of this.
 	cat /home/adrian/Projects/labs/foorester/cook/scripts/sql/pg/migrations/*.sql > pgall.sql
 	mv pgall.sql /tmp
 
 # CURL
 .PHONY: create-book
 create-book:
-	./scripts/curl/create_book.sh -h localhost -p 8080 -n "Recipe Book One" -d "Favorite Recipes"
+	./scripts/curl/create-book.sh -h localhost -p 8080 -n "Recipe Book One" -d "Favorite Recipes"

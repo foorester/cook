@@ -9,7 +9,7 @@ import (
 
 type (
 	Repo interface {
-		Tx(ctx context.Context) (tx db.Tx, err error)
+		DB(ctx context.Context) (db db.DB)
 	}
 
 	CookRepo interface {
