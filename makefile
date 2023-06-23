@@ -24,7 +24,6 @@ openapihttp:
 gensqlcpg:
 	sqlc generate -f ./configs/sqlc/pg.sqlc.yaml
 
-
 .PHONY: pgall
 pgall:
 	# Merge all migrations into one single file and move it to `/tmp`
@@ -38,3 +37,13 @@ pgall:
 .PHONY: create-book
 create-book:
 	./scripts/curl/create-book.sh -h localhost -p 8080 -n "Recipe Book One" -d "Favorite Recipes"
+
+.PHONY: installgomock
+installgomock:
+	go install github.com/golang/mock/mockgen@v1.6.0
+
+.PHONY: genportmocks
+genportmocks:
+	# gomock is required (make installgomock)
+	mockgen -source=internal/domain/port/repo.go -destination=internal/infra/repo/pgx/repo_mock_test.go -package=pgx_test
+

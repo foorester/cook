@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.18.0
 
-package pg
+package pgx
 
 import (
 	"context"

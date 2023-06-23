@@ -76,8 +76,8 @@ func (app *App) Setup(ctx context.Context) error {
 	// Event bus
 
 	// WIP: to avoid unused var message
-	app.Log().Debugf("Repo: %v", repo)
-	app.Log().Debugf("Service: %v", app.svc)
+	//app.Log().Debugf("Repo: %v", repo)
+	//app.Log().Debugf("Service: %v", app.svc)
 
 	return nil
 }
