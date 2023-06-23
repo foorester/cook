@@ -13,30 +13,25 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockRepo is a mock of Repo interface.
 type MockRepo struct {
 	ctrl     *gomock.Controller
 	recorder *MockRepoMockRecorder
 }
 
-// MockRepoMockRecorder is the mock recorder for MockRepo.
 type MockRepoMockRecorder struct {
 	mock *MockRepo
 }
 
-// NewMockRepo creates a new mock instance.
 func NewMockRepo(ctrl *gomock.Controller) *MockRepo {
 	mock := &MockRepo{ctrl: ctrl}
 	mock.recorder = &MockRepoMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 	return m.recorder
 }
 
-// DB mocks base method.
 func (m *MockRepo) DB(ctx context.Context) db.DB {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DB", ctx)
@@ -50,7 +45,6 @@ func (mr *MockRepoMockRecorder) DB(ctx interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DB", reflect.TypeOf((*MockRepo)(nil).DB), ctx)
 }
 
-// MockCookRepo is a mock of CookRepo interface.
 type MockCookRepo struct {
 	ctrl     *gomock.Controller
 	recorder *MockCookRepoMockRecorder
@@ -61,14 +55,12 @@ type MockCookRepoMockRecorder struct {
 	mock *MockCookRepo
 }
 
-// NewMockCookRepo creates a new mock instance.
 func NewMockCookRepo(ctrl *gomock.Controller) *MockCookRepo {
 	mock := &MockCookRepo{ctrl: ctrl}
 	mock.recorder = &MockCookRepoMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockCookRepo) EXPECT() *MockCookRepoMockRecorder {
 	return m.recorder
 }
@@ -81,13 +73,11 @@ func (m *MockCookRepo) CreateBook(ctx context.Context, recipe model.Book) error 
 	return ret0
 }
 
-// CreateBook indicates an expected call of CreateBook.
 func (mr *MockCookRepoMockRecorder) CreateBook(ctx, recipe interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBook", reflect.TypeOf((*MockCookRepo)(nil).CreateBook), ctx, recipe)
 }
 
-// CreateRecipe mocks base method.
 func (m *MockCookRepo) CreateRecipe(ctx context.Context, recipe model.Recipe) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRecipe", ctx, recipe)
@@ -95,13 +85,11 @@ func (m *MockCookRepo) CreateRecipe(ctx context.Context, recipe model.Recipe) er
 	return ret0
 }
 
-// CreateRecipe indicates an expected call of CreateRecipe.
 func (mr *MockCookRepoMockRecorder) CreateRecipe(ctx, recipe interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRecipe", reflect.TypeOf((*MockCookRepo)(nil).CreateRecipe), ctx, recipe)
 }
 
-// DB mocks base method.
 func (m *MockCookRepo) DB(ctx context.Context) db.DB {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DB", ctx)
@@ -109,13 +97,11 @@ func (m *MockCookRepo) DB(ctx context.Context) db.DB {
 	return ret0
 }
 
-// DB indicates an expected call of DB.
 func (mr *MockCookRepoMockRecorder) DB(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DB", reflect.TypeOf((*MockCookRepo)(nil).DB), ctx)
 }
 
-// GetUser mocks base method.
 func (m *MockCookRepo) GetUser(ctx context.Context, userID string) (model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUser", ctx, userID)
@@ -124,7 +110,6 @@ func (m *MockCookRepo) GetUser(ctx context.Context, userID string) (model.User, 
 	return ret0, ret1
 }
 
-// GetUser indicates an expected call of GetUser.
 func (mr *MockCookRepoMockRecorder) GetUser(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockCookRepo)(nil).GetUser), ctx, userID)

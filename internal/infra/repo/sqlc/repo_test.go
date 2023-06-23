@@ -24,14 +24,13 @@ func TestCreateBook(t *testing.T) {
 		db: mockDB, // WIP: Mock database interface (db is private, see how to solve this)
 	}
 
-	// Create a sample book
 	book := model.Book{
-		ID:          model.ID{val: uuid.New()}, // WIP: val is private, see how to solve this)
+		ID:          model.NewID(uuid.New()),
 		Name:        "Sample Book",
 		Description: "This is a sample book",
 		Owner: model.User{
 			ID:       uuid.New(),
-			Username: "john_doe",
+			Username: "johndoe",
 			Name:     "John Doe",
 			Email:    "john.doe@example.com",
 			Password: "password123",
