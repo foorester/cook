@@ -41,7 +41,7 @@ func NewServer(svc service.RecipeService, opts ...sys.Option) (server *Server) {
 func (srv *Server) Setup(ctx context.Context) {
 	h := NewCookHandler(srv.svc, srv.opts...)
 
-	reqLog := NewReqLoggerMW(srv.Log())
+	reqLog := NewReqLoggerMiddleware(srv.Log())
 
 	srv.router.Use(middleware.RequestID)
 	srv.router.Use(middleware.RealIP)

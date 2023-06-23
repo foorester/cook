@@ -50,7 +50,7 @@ func NewReqLogger(log log.Logger) *ReqLogger {
 	return &ReqLogger{log: log}
 }
 
-func NewReqLoggerMW(log log.Logger) func(next http.Handler) http.Handler {
+func NewReqLoggerMiddleware(log log.Logger) func(next http.Handler) http.Handler {
 	return middleware.RequestLogger(NewReqLogger(log))
 }
 

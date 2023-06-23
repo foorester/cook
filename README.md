@@ -18,8 +18,28 @@ There will be a separate code generator repository that utilizes Cook as a found
 While the generated code will be optimized for managing a small set of resources, developers will be not limited to this constraints and will be able to adapt and modify the generated code to suit their specific and more complex use cases.
 
 ## Usage
+```shell
+$ make run 
+go run ./cmd/cook/main.go
+[INF] 2023/06/23 12:01:16 cook starting...
+[INF] 2023/06/23 12:01:16 user=cook password=cook dbname=foorester host=127.0.0.1 port=5432 search_path=cook
+[INF] 2023/06/23 12:01:16 pgx-db database connected!
+[INF] 2023/06/23 12:01:16 cook started!
+[INF] 2023/06/23 12:01:16 http-server started listening at localhost:8080
 
-[To be completed]
+```
+
+Make a `create-book` request in another terminal
+```shell
+$ make create-book 
+./scripts/curl/create-book.sh -h localhost -p 8080 -n "Recipe Book One" -d "Favorite Recipes"
+```
+
+See the output
+```shell
+[DBG] 2023/06/23 12:01:51 ts: 2023/06/23 10:01:51, req-id: perun/uSr1bEITXA-000001, scheme: http, proto: HTTP/1.1, method: POST, addr: 127.0.0.1:37606, agent: curl/8.1.0, uri: http://localhost:8080/api/v1/books, status: 0, bytes: 0, elapsed: 0.470759ms
+```
+
 
 ## Highlighted files
 ### HTTP handlers
