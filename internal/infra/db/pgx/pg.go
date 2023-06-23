@@ -24,7 +24,7 @@ type (
 )
 
 const (
-	name = "pgx-db"
+	name = "sqlc-db"
 )
 
 func NewDB(opts ...sys.Option) *DB {

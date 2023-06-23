@@ -2,7 +2,7 @@
 // Source: internal/domain/port/repo.go
 
 // Package pgx_test is a generated GoMock package.
-package pgx_test
+package sqlc_test
 
 import (
 	context "context"
