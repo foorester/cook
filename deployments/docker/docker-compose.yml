@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: ../../
+      dockerfile: deployments/docker/dev/Dockerfile
+    ports:
+      - 8090:8080
+    depends_on:
+      - pg
+    environment:
+      - DB_HOST=pg
+      - DB_PORT=5432
+      - DB_USER=cook
+      - DB_PASSWORD=cook
+      - POSTGRES_SCHEMA=cook
+      - DB_NAME=foorester
+#    command: bash -c "if [ -z $(psql -U cook -h pg -tAc 'SELECT 1 FROM pg_database WHERE datname = ''pg''') ]; then /app/scripts/docker/setup.sh; fi && ./cook"
+    command: bash -c "
+      if [ -z \"$(psql -U cook -h pg -tAc 'SELECT 1 FROM pg_database WHERE datname = ''cook''')\" ]; then
+      /app/scripts/docker/setup.sh
+      fi
+      ./ak
+      "
+  pg:
+    image: postgres:10.5
+    restart: always
+    environment:
+      - POSTGRES_USER=cook
+      - POSTGRES_PASSWORD=cook
+      - POSTGRES_DB=cook
+      - POSTGRES_SCHEMA=foorester
+      - DB_SSLMODE=require
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - '5438:5432'
+    volumes:
+      - ../../tmp/postgres-data:/var/lib/postgresql/data
+      - ../../tmp/sql:/docker-entrypoint-initdb.d
+
+networks:
+  pg:
+    driver: bridge

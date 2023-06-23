@@ -8,6 +8,10 @@ type (
 	}
 )
 
+func NewID(uid uuid.UUID) ID {
+	return ID{val: uid}
+}
+
 func (i *ID) GenID(id ...uuid.UUID) {
 	if i.val != uuid.Nil {
 		return // already has a value assigned
