@@ -8,7 +8,7 @@ import (
 	"github.com/foorester/cook/internal/domain/service"
 	"github.com/foorester/cook/internal/infra/db/pgx"
 	http2 "github.com/foorester/cook/internal/infra/http"
-	pgxr "github.com/foorester/cook/internal/infra/repo/pgx"
+	pgxr "github.com/foorester/cook/internal/infra/repo/sqlc"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/config"
 	"github.com/foorester/cook/internal/sys/errors"

@@ -23,7 +23,7 @@ $ make run
 go run ./cmd/cook/main.go
 [INF] 2023/06/23 12:01:16 cook starting...
 [INF] 2023/06/23 12:01:16 user=cook password=cook dbname=foorester host=127.0.0.1 port=5432 search_path=cook
-[INF] 2023/06/23 12:01:16 pgx-db database connected!
+[INF] 2023/06/23 12:01:16 sqlc-db database connected!
 [INF] 2023/06/23 12:01:16 cook started!
 [INF] 2023/06/23 12:01:16 http-server started listening at localhost:8080
 
