@@ -1,4 +1,4 @@
-package pgx
+package sqlc
 
 import "github.com/foorester/cook/internal/sys/errors"
 
