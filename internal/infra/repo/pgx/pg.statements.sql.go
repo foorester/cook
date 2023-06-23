@@ -3,7 +3,7 @@
 //   sqlc v1.18.0
 // source: pg.statements.sql
 
-package pg
+package pgx
 
 import (
 	"context"
