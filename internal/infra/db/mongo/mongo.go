@@ -9,6 +9,7 @@ import (
 
 	"github.com/foorester/cook/internal/infra/db"
 	"github.com/foorester/cook/internal/sys"
+	"github.com/foorester/cook/internal/sys/config"
 	"github.com/foorester/cook/internal/sys/errors"
 )
 
@@ -24,6 +25,10 @@ type (
 
 const (
 	name = "mongo-db"
+)
+
+var (
+	cfgKey = config.Key
 )
 
 func NewDB(opts ...sys.Option) *DB {
@@ -62,10 +67,10 @@ func (db *DB) MongoConn(ctx context.Context) (*mongo.Client, error) {
 
 func (db *DB) connString() (connString string) {
 	cfg := db.Cfg()
-	user := cfg.GetString("db.mongo.user")
-	pass := cfg.GetString("db.mongo.pass")
-	name := cfg.GetString("db.mongo.database")
-	host := cfg.GetString("db.mongo.host")
-	port := cfg.GetInt("db.mongo.port")
+	user := cfg.GetString(cfgKey.MongoUser)
+	pass := cfg.GetString(cfgKey.MongoPass)
+	name := cfg.GetString(cfgKey.MongoDB)
+	host := cfg.GetString(cfgKey.MongoHost)
+	port := cfg.GetInt(cfgKey.MongoPort)
 	return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", user, pass, host, port, name)
 }

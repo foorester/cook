@@ -12,6 +12,7 @@ import (
 	"github.com/foorester/cook/internal/domain/service"
 	"github.com/foorester/cook/internal/infra/openapi"
 	"github.com/foorester/cook/internal/sys"
+	"github.com/foorester/cook/internal/sys/config"
 )
 
 type (
@@ -27,6 +28,10 @@ type (
 var (
 	httpServerName = "http-server"
 	apiV1PAth      = "/api/v1"
+)
+
+var (
+	cfgKey = config.Key
 )
 
 func NewServer(svc service.RecipeService, opts ...sys.Option) (server *Server) {
@@ -100,12 +105,12 @@ func (srv *Server) Mount(pattern string, handler http.Handler) {
 }
 
 func (srv *Server) Address() string {
-	host := srv.Cfg().GetString("http.server.host")
-	port := srv.Cfg().GetInt("http.server.port")
+	host := srv.Cfg().GetString(cfgKey.APIServerHost)
+	port := srv.Cfg().GetInt(cfgKey.APIServerPort)
 	return fmt.Sprintf("%s:%d", host, port)
 }
 
 func (srv *Server) ShutdownTimeout() time.Duration {
-	secs := time.Duration(srv.Cfg().GetInt("http.server.shutdown.timeout.secs"))
+	secs := time.Duration(srv.Cfg().GetInt(cfgKey.APIServerTimeout))
 	return secs * time.Second
 }

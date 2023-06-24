@@ -55,10 +55,10 @@ func (app *App) Setup(ctx context.Context) error {
 	app.EnableSupervisor()
 
 	// Databases
-	database := pgx.NewDB(app.opts...)
+	dbase := pgx.NewDB(app.opts...)
 
 	// Repos
-	repo, err := pgxr.NewCookRepo(database, app.opts...)
+	repo, err := pgxr.NewCookRepo(dbase, app.opts...)
 	if err != nil {
 		return err
 	}
