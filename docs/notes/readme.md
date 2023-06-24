@@ -10,3 +10,5 @@ There is temporary duplication between the database generation and initial popul
 
 ## Testing
 Unit testing, integration testing, and end-to-end testing are recognized as important factors in the development process. It is evident that there is a debt in this project in terms of testing, but it is only temporary. The exploratory process aimed at defining the best possible structure involves frequent changes. Once a stable implementation of the service is achieved, dedicated time will be allocated to thoroughly test every corner of the application.
+
+MockLogger in `log_test` should be replaced by `TestLogger` from `log` package.

@@ -51,27 +51,37 @@ genportmocks:
 	mockgen -source=internal/domain/port/repo.go -destination=internal/infra/repo/pgx/repo_mock_test.go -package=pgx_test
 
 # Docker
-.PHONY: dockerdev
-dockerdev:
+.PHONY: docker-dev
+docker-dev:
 	docker build . -t ak -f deployments/docker/dev/Dockerfile
 
-.PHONY: dockercompose
-dockercompose:
+.PHONY: docker-compose
+docker-compose:
+	# Run with sudo or, better, setup appropriate user permissions
 	rm -rf tmp/postgres-data
 	mkdir -p tmp/postgres-data
 	chmod -R 777 tmp
 	cp scripts/sql/docker/setup.sh tmp/sql
 	cp scripts/sql/docker/2023062300-initial-setup.sql tmp/sql
-	docker-compose -f deployments/docker/docker-compose.yml up --build # --abort-on-container-exit --remove-orphans
+	docker-compose -f ./deployments/docker/dev/docker-compose.yml up --build # --abort-on-container-exit --remove-orphans
 
-.PHONY: dockercomposedown
-dockercomposedown:
-	docker-compose -f deployments/docker/docker-compose.yml down
+.PHONY: docker-compose-down
+docker-compose-down:
+	docker-compose -f deployments/docker/dev/docker-compose.yml down
 
-.PHONY: dockerresetpg
-dockerrestpg:
-	sudo rm -rf tmp/postgres-data
+.PHONY: docker-reset-pg
+docker-rest-pg:
+	rm -rf tmp/postgres-data
 
-.PHONY: dockerpsql
-dockerpsql:
+.PHONY: docker-psql
+docker-psql:
 	sudo rm -rf ./tmp/postgres-data
+
+# Testing
+.PHONY: test
+test:
+	make -f makefile.test test-selected
+
+.PHONY: docker-test
+docker-test:
+	make -f makefile.test compose-test

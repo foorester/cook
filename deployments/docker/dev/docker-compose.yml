@@ -2,7 +2,7 @@ version: '3.8'
 services:
   app:
     build:
-      context: ../../
+      context: ../../../
       dockerfile: deployments/docker/dev/Dockerfile
     ports:
       - 8090:8080
@@ -20,7 +20,7 @@ services:
       if [ -z \"$(psql -U cook -h pg -tAc 'SELECT 1 FROM pg_database WHERE datname = ''cook''')\" ]; then
       /app/scripts/docker/setup.sh
       fi
-      ./ak
+      ./cook
       "
   pg:
     image: postgres:10.5
@@ -38,8 +38,8 @@ services:
     ports:
       - '5438:5432'
     volumes:
-      - ../../tmp/postgres-data:/var/lib/postgresql/data
-      - ../../tmp/sql:/docker-entrypoint-initdb.d
+      - /tmp/postgres-data:/var/lib/postgresql/data
+      - /tmp/sql:/docker-entrypoint-initdb.d
 
 networks:
   pg:
