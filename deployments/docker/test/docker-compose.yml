@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  pg:
+    image: postgis/postgis
+    ports:
+      - '5438:5432'
+    environment:
+      - POSTGRES_USER=cook
+      - POSTGRES_PASSWORD=cook
+      - POSTGRES_DB=cook
+      - POSTGRES_SCHEMA=foorester
+      - DB_SSLMODE=require
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    volumes:
+      - /tmp/postgres-data:/var/lib/postgresql/data
+      - /tmp/sql:/docker-entrypoint-initdb.d
+    restart: on-failure
+
+  tests:
+    build:
+      context: ../../../
+      dockerfile: deployments/docker/test/Dockerfile
+    hostname: tests
+    depends_on:
+      - pg
