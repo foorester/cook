@@ -10,6 +10,7 @@ import (
 
 	"github.com/foorester/cook/internal/infra/db"
 	"github.com/foorester/cook/internal/sys"
+	"github.com/foorester/cook/internal/sys/config"
 
 	"github.com/foorester/cook/internal/sys/errors"
 )
@@ -25,6 +26,10 @@ type (
 
 const (
 	name = "sqlc-db"
+)
+
+var (
+	cfgKey = config.Key
 )
 
 func NewDB(opts ...sys.Option) *DB {
@@ -69,13 +74,13 @@ func (db *DB) PGXConn(ctx context.Context) (conn *pgx.Conn, err error) {
 
 func (db *DB) connString() (connString string) {
 	cfg := db.Cfg()
-	user := cfg.GetString("db.pg.user")
-	pass := cfg.GetString("db.pg.pass")
-	name := cfg.GetString("db.pg.database")
-	host := cfg.GetString("db.pg.host")
-	port := cfg.GetInt("db.pg.port")
-	schema := cfg.GetString("db.pg.schema")
-	sslMode := cfg.GetBool("db.pg.sslmode")
+	user := cfg.GetString(cfgKey.PgUser)
+	pass := cfg.GetString(cfgKey.PgPass)
+	name := cfg.GetString(cfgKey.PgDB)
+	host := cfg.GetString(cfgKey.PgHost)
+	port := cfg.GetInt(cfgKey.PgPort)
+	schema := cfg.GetString(cfgKey.PgSchema)
+	sslMode := cfg.GetBool(cfgKey.PgSSL)
 
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d search_path=%s", user, pass, name, host, port, schema)
 	db.Log().Infof(connStr)
