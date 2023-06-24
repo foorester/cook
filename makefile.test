@@ -1,0 +1,22 @@
+# Tests
+
+.PHONY: test-selected
+test-selected:
+	clear
+	make -f makefile.test test-create-book
+
+## Book
+.PHONY: test-create-book
+test-create-book:
+	go test -v -run TestCreateBook -count=1 -timeout=10s internal/infra/repo/sqlc/repo_test.go
+
+
+## Dockerized test:
+.PHONY: compose-test
+compose-test:
+	clear
+	make -f makefile.test compose-repo-test
+
+.PHONY: compose-repo-test
+compose-repo-test:
+	docker-compose -f ./deployments/docker/test/docker-compose.yml up --build --abort-on-container-exit --remove-orphans

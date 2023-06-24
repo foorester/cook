@@ -34,7 +34,7 @@ type SimpleLogger struct {
 }
 
 func NewLogger(logLevel string) *SimpleLogger {
-	level := toValidLevel(logLevel)
+	level := ToValidLevel(logLevel)
 	return &SimpleLogger{
 		debug:    log.New(os.Stdout, "[DBG] ", log.LstdFlags),
 		info:     log.New(os.Stdout, "[INF] ", log.LstdFlags),
@@ -86,7 +86,7 @@ func (l *SimpleLogger) Errorf(format string, a ...any) {
 	}
 }
 
-func toValidLevel(level string) LogLevel {
+func ToValidLevel(level string) LogLevel {
 	level = strings.ToLower(level)
 
 	switch level {

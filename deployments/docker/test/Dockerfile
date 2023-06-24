@@ -15,11 +15,7 @@ COPY ../.. .
 
 # Build the app (not required for tests, but included for consistency)
 ENV CGO_ENABLED=0 GOOS=linux
-RUN go build -v -o cook cmd/cook/main.go
-
-# Port
-EXPOSE 8080
+RUN go test ./internal/infra/repo/sqlc/repo_test.go ./internal/infra/repo/sqlc/repo_mock_test.go -c -o repo_test
 
 # Set the entrypoint to run the test
-ENTRYPOINT ["./cook"]
-
+ENTRYPOINT ["./repo_test"]
