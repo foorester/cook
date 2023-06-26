@@ -35,7 +35,7 @@ func NewCookRepo(db db.DB, opts ...sys.Option) (cr *CookRepo, err error) {
 func (cr *CookRepo) Setup(ctx context.Context) (err error) {
 	err = cr.db.Connect(ctx)
 	if err != nil {
-		err = errors.Wrap("cook repo setup error", err)
+		err = errors.Wrap(err, "cook repo setup error")
 		return err
 	}
 
@@ -51,7 +51,7 @@ func (cr *CookRepo) CreateBook(ctx context.Context, b model.Book) (err error) {
 
 	args, err := toInsertBookParams(b)
 	if err != nil {
-		return errors.Wrap("create book err", err)
+		return errors.Wrap(err, "create book err")
 	}
 
 	conn, err := cr.Conn(ctx)

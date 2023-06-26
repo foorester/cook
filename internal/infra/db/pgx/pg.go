@@ -46,13 +46,13 @@ func (db *DB) Connect(ctx context.Context) (err error) {
 	db.pool, err = pgxpool.New(ctx, db.connString())
 	if err != nil {
 		msg := fmt.Sprintf("%s connection error", db.Name())
-		return errors.Wrap(msg, err)
+		return errors.Wrap(err, msg)
 	}
 
 	err = db.pool.Ping(ctx)
 	if err != nil {
 		msg := fmt.Sprintf("%s ping connection error", db.Name())
-		return errors.Wrap(msg, err)
+		return errors.Wrap(err, msg)
 	}
 
 	db.Log().Infof("%s database connected!", db.Name())

@@ -9,14 +9,14 @@ import (
 
 type (
 	BookValidator struct {
-		core.Validator
+		domain.Validator
 		Model model.Book
 	}
 )
 
 func NewBookValidator(m model.Book) BookValidator {
 	return BookValidator{
-		Validator: core.NewValidator(),
+		Validator: domain.NewValidator(),
 		Model:     m,
 	}
 }
@@ -45,7 +45,7 @@ func (v BookValidator) ValidateRequiredName(errMsg ...string) (ok bool) {
 		return true
 	}
 
-	msg := core.ValidatorMsg.RequiredErrMsg
+	msg := domain.ValidatorMsg.RequiredErrMsg
 	if len(errMsg) > 0 {
 		msg = errMsg[0]
 	}
@@ -62,7 +62,7 @@ func (v BookValidator) ValidateMinLengthName(min int, errMsg ...string) (ok bool
 		return true
 	}
 
-	msg := core.ValidatorMsg.MinLengthErrMsg
+	msg := domain.ValidatorMsg.MinLengthErrMsg
 	if len(errMsg) > 0 {
 		msg = errMsg[0]
 	}
@@ -79,7 +79,7 @@ func (v BookValidator) ValidateMaxLengthName(max int, errMsg ...string) (ok bool
 		return true
 	}
 
-	msg := core.ValidatorMsg.MaxLengthErrMsg
+	msg := domain.ValidatorMsg.MaxLengthErrMsg
 	if len(errMsg) > 0 {
 		msg = errMsg[0]
 	}
@@ -90,14 +90,14 @@ func (v BookValidator) ValidateMaxLengthName(max int, errMsg ...string) (ok bool
 
 type (
 	RecipeValidator struct {
-		core.Validator
+		domain.Validator
 		Model model.Recipe
 	}
 )
 
 func NewRecipeValidator(m model.Recipe) RecipeValidator {
 	return RecipeValidator{
-		Validator: core.NewValidator(),
+		Validator: domain.NewValidator(),
 		Model:     m,
 	}
 }
@@ -125,7 +125,7 @@ func (v RecipeValidator) ValidateRequiredName(errMsg ...string) (ok bool) {
 		return true
 	}
 
-	msg := core.ValidatorMsg.RequiredErrMsg
+	msg := domain.ValidatorMsg.RequiredErrMsg
 	if len(errMsg) > 0 {
 		msg = errMsg[0]
 	}
@@ -142,7 +142,7 @@ func (v RecipeValidator) ValidateMinLengthName(min int, errMsg ...string) (ok bo
 		return true
 	}
 
-	msg := core.ValidatorMsg.MinLengthErrMsg
+	msg := domain.ValidatorMsg.MinLengthErrMsg
 	if len(errMsg) > 0 {
 		msg = errMsg[0]
 	}
@@ -159,7 +159,7 @@ func (v RecipeValidator) ValidateMaxLengthName(max int, errMsg ...string) (ok bo
 		return true
 	}
 
-	msg := core.ValidatorMsg.MaxLengthErrMsg
+	msg := domain.ValidatorMsg.MaxLengthErrMsg
 	if len(errMsg) > 0 {
 		msg = errMsg[0]
 	}

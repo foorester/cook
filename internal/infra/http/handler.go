@@ -49,7 +49,7 @@ func (h *CookHandler) PostBook(w http.ResponseWriter, r *http.Request) {
 	// Session
 	userID, err := h.User(r)
 	if err != nil {
-		err = errors.Wrap("post book error", err)
+		err = errors.Wrap(err, "post book error")
 		h.handleError(w, err)
 	}
 
@@ -71,7 +71,7 @@ func (h *CookHandler) PostBook(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	res := h.Service().CreateBook(ctx, book)
 	if err = res.Err(); err != nil {
-		err = errors.Wrap("post book error", err)
+		err = errors.Wrap(err, "post book error")
 		h.handleError(w, err)
 	}
 }

@@ -9,10 +9,6 @@ const (
 	validationError = "Check fields with errors"
 )
 
-const (
-	exposeIntKey = "api.errors.expose.internal"
-)
-
 type (
 	ServiceRes struct {
 		msg            string           // Human readable message exposed to client
@@ -41,7 +37,7 @@ func (sr *ServiceRes) Err() error {
 func NewServiceRes(valErrSet core.ValErrorSet, err error, cfg *config.Config) ServiceRes {
 	return ServiceRes{
 		msg:            validationError,
-		exposeInternal: cfg.GetBool(exposeIntKey),
+		exposeInternal: cfg.GetBool(config.Key.APIErrorExposeInt),
 		valErrSet:      valErrSet,
 		err:            err,
 	}
