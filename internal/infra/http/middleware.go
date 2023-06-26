@@ -17,14 +17,15 @@ type (
 )
 
 const (
-	BookCtxKey = "book"
+	ListCtxKey = "list"
+	ReqCtxKey  = "req"
 )
 
-func BookContext(next http.Handler) http.Handler {
+func ListContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bookID := "a4e52de2-352b-4a61-964b-7efb7c137538" // WIP: Extract it from path
+		listID := "a4e52de2-352b-4a61-964b-7efb7c137538" // WIP: Extract it from path
 
-		ctx := context.WithValue(r.Context(), BookCtxKey, bookID)
+		ctx := context.WithValue(r.Context(), ListCtxKey, listID)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -51,13 +52,30 @@ func NewReqLogger(log log.Logger) *ReqLogger {
 }
 
 func NewReqLoggerMiddleware(log log.Logger) func(next http.Handler) http.Handler {
-	return middleware.RequestLogger(NewReqLogger(log))
+	return func(next http.Handler) http.Handler {
+		rl := NewReqLogger(log)
+
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			entry := rl.NewLogEntry(r.Context())
+			ww := NewWrapResponseWriter(w)
+
+			t1 := time.Now()
+			defer func() {
+				entry.Write(ww.Status(), ww.BytesWritten(), ww.Header(), time.Since(t1), nil)
+			}()
+
+			next.ServeHTTP(ww, r.WithContext(context.WithValue(r.Context(), middleware.LogEntryCtxKey, entry)))
+		})
+	}
 }
 
-func (rl *ReqLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
+func (rl *ReqLogger) NewLogEntry(ctx context.Context) middleware.LogEntry {
 	fields := map[string]string{}
 
-	if reqID := middleware.GetReqID(r.Context()); reqID != "" {
+	r := ctx.Value(ReqCtxKey).(*http.Request)
+
+	reqID := r.Header.Get("X-Request-Id")
+	if reqID != "" {
 		fields["req-id"] = reqID
 	}
 
@@ -79,7 +97,10 @@ func (rl *ReqLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 		sb.WriteString(fmt.Sprintf("%s: %s, ", k, v))
 	}
 
-	return NewLogEntry(rl.Log(), &sb)
+	return &LogEntry{
+		log:   rl.Log(),
+		entry: &sb,
+	}
 }
 
 type (
@@ -88,13 +109,6 @@ type (
 		entry *strings.Builder
 	}
 )
-
-func NewLogEntry(log log.Logger, sb *strings.Builder) *LogEntry {
-	return &LogEntry{
-		log:   log,
-		entry: sb,
-	}
-}
 
 func (le *LogEntry) Log() log.Logger {
 	return le.log
@@ -111,4 +125,33 @@ func (le *LogEntry) Panic(v interface{}, stack []byte) {
 	le.entry.WriteString(fmt.Sprintf("%s: %s, ", "stack", string(stack)))
 	le.entry.WriteString(fmt.Sprintf("%s: %s, ", "panic", fmt.Sprintf("%+v", v)))
 	le.Log().Debugf("%s", le.entry.String())
+}
+
+type WrapResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+	bytes      int
+}
+
+func NewWrapResponseWriter(w http.ResponseWriter) *WrapResponseWriter {
+	return &WrapResponseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+}
+
+func (ww *WrapResponseWriter) WriteHeader(code int) {
+	ww.statusCode = code
+	ww.ResponseWriter.WriteHeader(code)
+}
+
+func (ww *WrapResponseWriter) Write(b []byte) (int, error) {
+	bytesWritten, err := ww.ResponseWriter.Write(b)
+	ww.bytes += bytesWritten
+	return bytesWritten, err
+}
+
+func (ww *WrapResponseWriter) Status() int {
+	return ww.statusCode
+}
+
+func (ww *WrapResponseWriter) BytesWritten() int {
+	return ww.bytes
 }

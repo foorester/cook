@@ -46,12 +46,12 @@ func (db *DB) Connect(ctx context.Context) (err error) {
 	connString := db.connString()
 	db.client, err = mongo.NewClient(options.Client().ApplyURI(connString))
 	if err != nil {
-		return errors.Wrap("MongoDB connect client error", err)
+		return errors.Wrap(err, "MongoDB connect client error")
 	}
 
 	err = db.client.Connect(ctx)
 	if err != nil {
-		return errors.Wrap("MongoDB connect error", err)
+		return errors.Wrap(err, "MongoDB connect error")
 	}
 
 	dbName := db.Cfg().GetString("store.write.db.mongo")
