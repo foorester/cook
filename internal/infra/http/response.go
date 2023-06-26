@@ -32,7 +32,7 @@ func (h *CookHandler) handleSuccess(w http.ResponseWriter, payload interface{}, 
 	w.WriteHeader(http.StatusOK)
 	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
-		h.Log().Error(errors.Wrap("error encoding handler success", err))
+		h.Log().Error(errors.Wrap(err, "error encoding handler success"))
 	}
 
 	return

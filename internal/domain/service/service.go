@@ -50,7 +50,7 @@ func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq) (res Create
 	// Set Owner
 	user, err := rs.Repo().GetUser(ctx, req.UserID)
 	if err != nil {
-		err = errors.Wrap("create book error", err)
+		err = errors.Wrap(err, "create book error")
 		return NewCreateBookRes(nil, err, rs.Cfg())
 	}
 
@@ -59,7 +59,7 @@ func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq) (res Create
 	// Persist it
 	err = rs.Repo().CreateBook(ctx, book)
 	if err != nil {
-		err = errors.Wrap("create book error", err)
+		err = errors.Wrap(err, "create book error")
 		return NewCreateBookRes(nil, err, rs.Cfg())
 	}
 
