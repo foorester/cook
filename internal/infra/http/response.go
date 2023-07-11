@@ -49,7 +49,7 @@ func (h *CookHandler) handleError(w http.ResponseWriter, handlerError error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
-		h.Log().Error(errors.Wrap("error encoding handler error", err))
+		h.Log().Error(errors.Wrap(err, "error encoding handler error"))
 	}
 
 	return

@@ -81,7 +81,7 @@ func (rs *Recipe) CreateRecipe(ctx context.Context, req CreateRecipeReq) (res Cr
 	// Persist it
 	err = rs.Repo().CreateRecipe(ctx, recipe)
 	if err != nil {
-		err = errors.Wrap("create recipe error", err)
+		err = errors.Wrap(err, "create recipe error")
 		return NewCreateRecipeRes(nil, err, rs.Cfg())
 	}
 
@@ -100,7 +100,7 @@ func (rs *Recipe) Start(ctx context.Context) error {
 	err := db.Start(ctx)
 	if err != nil {
 		msg := fmt.Sprintf("%s start error", rs.Name())
-		return errors.Wrap(msg, err)
+		return errors.Wrap(err, msg)
 	}
 
 	return nil

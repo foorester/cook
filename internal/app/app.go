@@ -45,7 +45,7 @@ func (app *App) Run() (err error) {
 
 	err = app.Setup(ctx)
 	if err != nil {
-		return errors.Wrap(runError, err)
+		return errors.Wrap(err, runError)
 	}
 
 	return app.Start(ctx)
@@ -88,7 +88,7 @@ func (app *App) Start(ctx context.Context) error {
 
 	err := app.svc.Start(ctx)
 	if err != nil {
-		return errors.Wrap("app start error", err)
+		return errors.Wrap(err, "app start error")
 	}
 
 	app.supervisor.AddTasks(
