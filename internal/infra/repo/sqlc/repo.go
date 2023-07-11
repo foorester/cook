@@ -56,7 +56,7 @@ func (cr *CookRepo) CreateBook(ctx context.Context, b model.Book) (err error) {
 
 	conn, err := cr.Conn(ctx)
 	if err != nil {
-		return errors.Wrap("create book err", err)
+		return errors.Wrap(err, "create book err")
 	}
 
 	queries := NewQueries(conn)
@@ -66,7 +66,7 @@ func (cr *CookRepo) CreateBook(ctx context.Context, b model.Book) (err error) {
 }
 
 func (cr *CookRepo) CreateRecipe(ctx context.Context, r model.Recipe) (err error) {
-	return errors.NewError("not implemented yet")
+	return errors.New("not implemented yet")
 }
 
 func (cr *CookRepo) Conn(ctx context.Context) (*pgx.Conn, error) {
