@@ -112,7 +112,7 @@ func (h *CookHandler) PostRecipe(w http.ResponseWriter, r *http.Request, bookID 
 	// Session
 	userID, err := h.User(r)
 	if err != nil {
-		err = errors.Wrap("post book error", err)
+		err = errors.Wrap(err, "post book error")
 		h.handleError(w, err)
 	}
 
@@ -135,7 +135,7 @@ func (h *CookHandler) PostRecipe(w http.ResponseWriter, r *http.Request, bookID 
 	ctx := r.Context()
 	res := h.Service().CreateRecipe(ctx, recipe)
 	if err = res.Err(); err != nil {
-		err = errors.Wrap("post book error", err)
+		err = errors.Wrap(err, "post book error")
 		h.handleError(w, err)
 	}
 }
@@ -251,27 +251,10 @@ func (h *CookHandler) User(r *http.Request) (userID string, err error) {
 	return uid, nil
 }
 
-// Book returns the book ID from request context.
-// Chi router + OpenAPI makes this unnecessary but can be useful when using
-// stdlib or a Chi router custom middleware.
-func (h *CookHandler) Book(r *http.Request) (bookID string, err error) {
-	val := r.Context().Value(BookCtxKey)
-	if val != nil {
-		switch v := val.(type) {
-		case string:
-			return v, nil
-		default:
-			return bookID, InvalidValueTypeErr
-		}
-	}
-
-	return bookID, BookNotFoundErr
-}
-
 // closeBody close the body and log errors if happened.
 func (h *CookHandler) closeBody(body io.ReadCloser) {
 	if err := body.Close(); err != nil {
-		h.Log().Error(errors.Wrap("failed to close body", err))
+		h.Log().Error(errors.Wrap(err, "failed to close body"))
 	}
 }
 

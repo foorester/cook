@@ -5,7 +5,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/foorester/cook/internal/sys/log"
+	"github.com/vanillazen/stl/backend/internal/sys/log"
 )
 
 // MockLogger is a mock implementation of the Logger interface for testing.
