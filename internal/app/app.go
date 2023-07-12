@@ -24,8 +24,11 @@ type App struct {
 	svc        service.RecipeService
 }
 
-func NewApp(name, namespace string, log log.Logger) (app *App) {
-	cfg := config.Load(namespace)
+func NewApp(name string, log log.Logger) (app *App, err error) {
+	cfg, err := config.NewConfig(name).Load()
+	if err != nil {
+		return nil, errors.Wrap(err, launchError)
+	}
 
 	opts := []sys.Option{
 		sys.WithConfig(cfg),
@@ -37,7 +40,7 @@ func NewApp(name, namespace string, log log.Logger) (app *App) {
 		opts: opts,
 	}
 
-	return app
+	return app, nil
 }
 
 func (app *App) Run() (err error) {
