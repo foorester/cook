@@ -15,8 +15,8 @@ services:
         max-size: 10m
         max-file: "3"
     volumes:
-      - /tmp/postgres-data:/var/lib/postgresql/data
-      - /tmp/sql:/docker-entrypoint-initdb.d
+      - /..tmp/postgres-data:/var/lib/postgresql/data
+      - /.tmp/sql:/docker-entrypoint-initdb.d
     restart: on-failure
 
   tests:

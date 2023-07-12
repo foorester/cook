@@ -9,18 +9,21 @@ import (
 
 const (
 	name     = "cook"
-	env      = "ck"
 	logLevel = "info"
 )
 
 var (
-	log l.Logger = l.NewLogger(logLevel)
+	log = l.NewLogger(logLevel)
 )
 
 func main() {
-	app := a.NewApp(name, env, log)
+	app, err := a.NewApp(name, log)
+	if err != nil {
+		log.Errorf("%s exit error: %s", name, err.Error())
+		os.Exit(1)
+	}
 
-	err := app.Run()
+	err = app.Run()
 	if err != nil {
 		log.Errorf("%s exit error: %s", name, err.Error())
 		os.Exit(1)

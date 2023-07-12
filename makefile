@@ -10,7 +10,7 @@ build:
 
 .PHONY: run
 run:
-	go run ./cmd/$(app)/main.go
+	go run ./cmd/$(app)/main.go --config-file=configs/config.yml
 
 # OpenAPI
 .PHONY: openapihttp
@@ -27,9 +27,9 @@ gensqlcpg:
 
 .PHONY: pgall
 pgall:
-	# Merge all migrations into one single file and move it to `/tmp`
+	# Merge all migrations into one single file and move it to `/.tmp`
 	# Execute make command with sudo
-	# psql: `\i /tmp/pgall.sql`
+	# psql: `\i /.tmp/pgall.sql`
 	# WIP: Later a migrator will take care of this.
 	cat /home/adrian/Projects/labs/foorester/cook/scripts/sql/pg/migrations/*.sql > pgall.sql
 	mv pgall.sql /tmp
