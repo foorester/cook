@@ -5,7 +5,7 @@ Cook is a simple example application that serves as a reference implementation f
 ## Key Features
 
 - Versionable REST API: Cook enables the implementation of a versioned REST API, allowing for future updates and enhancements.
-- Minimal Dependencies: The application strives to minimize external dependencies and primarily utilizes the Go standard library. However, alternative implementations may be considered if they offer better solutions for specific features. For example, we have chosen to use [Chi](https://github.com/go-chi/chi) as the routing library.
+- M̶i̶n̶i̶m̶a̶l̶ ̶D̶e̶p̶e̶n̶d̶e̶n̶c̶i̶e̶s̶:̶ ̶T̶h̶e̶ ̶a̶p̶p̶l̶i̶c̶a̶t̶i̶o̶n̶ ̶s̶t̶r̶i̶v̶e̶s̶ ̶t̶o̶ ̶m̶i̶n̶i̶m̶i̶z̶e̶ ̶e̶x̶t̶e̶r̶n̶a̶l̶ ̶d̶e̶p̶e̶n̶d̶e̶n̶c̶i̶e̶s̶ ̶a̶n̶d̶ ̶p̶r̶i̶m̶a̶r̶i̶l̶y̶ ̶u̶t̶i̶l̶i̶z̶e̶s̶ ̶t̶h̶e̶ ̶G̶o̶ ̶s̶t̶a̶n̶d̶a̶r̶d̶ ̶l̶i̶b̶r̶a̶r̶y̶.̶ This application aims to reduce reliance on external dependencies while maintaining flexibility. It adopts established industry libraries for tasks such as configuration, routing, and interface definition language, such as OpenAPI and gRPC, when necessary. A more stringent implementation strategy, focusing on utilizing Go's standard library extensively can be found here [https://github.com/vanillazen/stl](https://github.com/vanillazen/stl).
 - Use of Interfaces: Cook leverages interfaces to facilitate testing and enable the plugging in of alternative implementations, promoting modularity and flexibility.
 - Single Resource Focus: Cook is specifically designed for managing a single resource, but it can be extended as desired to accommodate more complex business rules, you can easily adapt the generated code from the code generator in another repository to suit your more complex use cases.
 
