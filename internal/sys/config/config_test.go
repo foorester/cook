@@ -3,117 +3,114 @@ package config_test
 import (
 	"os"
 	"testing"
+	"time"
+
+	"github.com/fsnotify/fsnotify"
 
 	"github.com/foorester/cook/internal/sys/config"
 )
 
-// TestGet default (no reload)
-func TestGet(t *testing.T) {
-	// Set some namespaced environment variables.
-	err := os.Setenv("CFG_SERVER_HOST", "localhost")
+func TestLoad(t *testing.T) {
+	// Create a temporary directory and file for testing
+	tmpFile, err := os.CreateTemp("", "test_load_*.yml")
 	if err != nil {
-		t.Errorf("Test setup error: %s", err.Error())
+		t.Fatal(err)
 	}
-	err = os.Setenv("CFG_SERVER_PORT", "8080")
+	defer os.Remove(tmpFile.Name())
+
+	tmpFile, err = os.OpenFile(tmpFile.Name(), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
-		t.Errorf("Test setup error: %s", err.Error())
+		t.Fatal(err)
 	}
 
-	// Start a config handler.
-	cfg := config.Config{}
-	cfg.SetNamespace("CFG")
+	// Update the configuration file
+	_, err = tmpFile.WriteString("key1: 123\n")
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	// Read and process environment variables.
-	res := cfg.Get()
+	err = tmpFile.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	// Assert result.
-	host, ok1 := res["server.host"]
-	port, ok2 := res["server.port"]
+	// Load the configuration
+	cfg := config.NewConfig("test")
+	_, err = cfg.Load(tmpFile.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	if !ok1 || !ok2 || host != "localhost" || port != "8080" {
-		t.Error("error processing config environment variables")
+	// Check that the configuration was loaded correctly
+	val := cfg.GetString("key1")
+	if val != "123" {
+		t.Errorf("Expected test value to be 123, got %s", val)
 	}
 }
 
-// TestGet no reload
-func TestGetNoReload(t *testing.T) {
-	// Set some namespaced environment variables.
-	err := os.Setenv("CFG_SERVER_HOST", "localhost")
+func TestOnConfigChange(t *testing.T) {
+	cfg := config.NewConfig("test")
+	tmpFile, err := os.CreateTemp("", "test_on_config_change_*.yml")
 	if err != nil {
-		t.Errorf("Test setup error: %s", err.Error())
+		t.Fatal(err)
 	}
-	err = os.Setenv("CFG_SERVER_PORT", "8080")
+	defer os.Remove(tmpFile.Name())
+
+	tmpFile, err = os.OpenFile(tmpFile.Name(), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
-		t.Errorf("Test setup error: %s", err.Error())
+		t.Fatal(err)
 	}
 
-	// Start a config handler.
-	cfg := config.Config{}
-	cfg.SetNamespace("CFG")
-
-	// Read and process environment variables.
-	res := cfg.Get(false)
-
-	// Assert result.
-	host, ok1 := res["server.host"]
-	port, ok2 := res["server.port"]
-
-	if !ok1 || !ok2 || host != "localhost" || port != "8080" {
-		t.Error("error processing config environment variables")
-	}
-}
-
-// TestGet reload
-func TestGetReload(t *testing.T) {
-	// Set some namespaced environment variables.
-	err := os.Setenv("CFG_SERVER_HOST", "localhost")
+	// Update the configuration file
+	_, err = tmpFile.WriteString("key1: 123\n")
 	if err != nil {
-		t.Errorf("Test setup error: %s", err.Error())
+		t.Fatal(err)
 	}
-	err = os.Setenv("CFG_SERVER_PORT", "8080")
+
+	err = tmpFile.Close()
 	if err != nil {
-		t.Errorf("Test setup error: %s", err.Error())
+		t.Fatal(err)
 	}
 
-	// Start a config handler.
-	cfg := config.Config{}
-	cfg.SetNamespace("CFG")
-
-	// Read and process environment variables.
-	res := cfg.Get(true)
-
-	// Assert result.
-	host, ok1 := res["server.host"]
-	port, ok2 := res["server.port"]
-
-	if !ok1 || !ok2 || host != "localhost" || port != "8080" {
-		t.Error("error processing config environment variables")
-	}
-}
-
-func TestLoadEnvVars(t *testing.T) {
-	// Set some namespaced environment variables.
-	err := os.Setenv("CFG_SERVER_HOST", "localhost")
+	// Initial load
+	_, err = cfg.Load(tmpFile.Name())
 	if err != nil {
-		t.Errorf("Test setup error: %s", err.Error())
+		t.Fatal(err)
 	}
-	err = os.Setenv("CFG_SERVER_PORT", "8080")
+
+	// Watch for changes
+	onChangeCalled := false
+	cfg.SetOnConfigChange(func(e fsnotify.Event) {
+		onChangeCalled = true
+	})
+
+	tmpFile, err = os.OpenFile(tmpFile.Name(), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
-		t.Errorf("Test setup error: %s", err.Error())
+		t.Fatal(err)
 	}
 
-	// Start a config handler.
-	cfg := config.Config{}
-	cfg.SetNamespace("CFG")
+	// Update the configuration file
+	_, err = tmpFile.WriteString("key1: 321\n")
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	// Read and process environment variables.
-	res := cfg.ReadNamespaceEnvVars()
+	err = tmpFile.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	// Assert result.
-	host, ok1 := res["server.host"]
-	port, ok2 := res["server.port"]
+	// It takes a bit to detect the changes on config
+	time.Sleep(2 * time.Second)
 
-	if !ok1 || !ok2 || host != "localhost" || port != "8080" {
-		t.Error("error processing config environment variables")
+	// Check if the onChange function was called
+	if !onChangeCalled {
+		t.Error("onChange function was not called")
+	}
+
+	// Check if the updated value was loaded
+	val := cfg.GetInt("key1")
+	if val != 321 {
+		t.Errorf("unexpected value for key1: %d", val)
 	}
 }
