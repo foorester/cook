@@ -9,7 +9,7 @@ The Migrator package provides functionality for handling the creation and rollba
 To use the Migrator package in your project, import it as follows:
 
 ```go
-import "github.com/vanillazen/stl/backend/internal/infra/migration/sqlite"
+import "github.com/foorester/cook/internal/infra/migration/pg"
 ```
 
 ### Creating Migrations
@@ -51,7 +51,7 @@ To create a migration, follow these steps:
    DROP TABLE users;
    ```
 
-3. Save the migration file in the designated directory: `assets/migrations/sqlite/`.
+3. Save the migration file in the designated directory: `assets/migrations/pg/`.
 
 ### Applying Migrations
 
@@ -59,10 +59,10 @@ To apply the migrations and update your database schema, you can use the `Migrat
 
 ```go
 import (
-  "github.com/vanillazen/stl/backend/internal/infra/migration/sqlite"
+  "github.com/foorester/cook/internal/infra/migration/pg"
 )
 
-//go:embed assets/seeding/sqlite/*.sql
+//go:embed assets/seeding/pg/*.sql
 var fs embed.FS
 
 // ...
@@ -74,7 +74,7 @@ if err != nil {
 }
 ```
 
-Here, `fs` represents the embedded filesystem that contains the migration files. The migrations are stored in the `assets/migrations/sqlite/` directory within the embedded filesystem. The `//go:embed` directive is used to include these migration files in the embedded filesystem.
+Here, `fs` represents the embedded filesystem that contains the migration files. The migrations are stored in the `assets/migrations/pg/` directory within the embedded filesystem. The `//go:embed` directive is used to include these migration files in the embedded filesystem.
 
 The migrator uses the file names to infer the migration index and name. For example, the `Up` migration from file named `00000001-users.sql` would be represented in the database as when executed.
 
