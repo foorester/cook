@@ -13,6 +13,15 @@ func newCfgKeyReg() *cfgKeyReg {
 
 		// Postgres
 
+		SQLiteUser:     "db.sqlite.user",
+		SQLitePass:     "db.sqlite.pass",
+		SQLiteDB:       "db.sqlite.database",
+		SQLiteHost:     "db.sqlite.host",
+		SQLiteSchema:   "db.sqlite.schema",
+		SQLiteFilePath: "db.sqlite.filepath",
+
+		// Postgres
+
 		PgUser:   "db.pg.user",
 		PgPass:   "db.pg.pass",
 		PgDB:     "db.pg.database",
@@ -36,6 +45,17 @@ type cfgKeyReg struct {
 	APIServerPort     string
 	APIServerTimeout  string
 	APIErrorExposeInt string
+
+	// SQLite
+
+	SQLiteUser     string
+	SQLitePass     string
+	SQLiteDB       string
+	SQLiteHost     string
+	SQLitePort     string
+	SQLiteSchema   string
+	SQLiteSSL      string
+	SQLiteFilePath string
 
 	// Postgres
 
