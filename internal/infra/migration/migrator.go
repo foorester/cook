@@ -1,14 +1,17 @@
-package migrator
+package migration
 
 import (
-	"github.com/vanillazen/stl/backend/internal/sys"
+	"database/sql"
+
+	"github.com/foorester/cook/internal/infra/migration/sqlite"
+	"github.com/foorester/cook/internal/sys"
 )
 
 type (
 	Migrator interface {
 		sys.Core
 		// Migrate applies pending seeding
-		Seed() error
+		Migrate() error
 		// Rollback reverts from one to N seeding already applied
 		Rollback(steps ...int) error
 		// RollbackAll reverts all seeding allready applied
@@ -23,3 +26,13 @@ type (
 		AssetsPath() string
 	}
 )
+
+type Exec interface {
+	Config(up sqlite.MigFx, down sqlite.MigFx)
+	GetIndex() (i int64)
+	GetName() (name string)
+	GetUp() (up sqlite.MigFx)
+	GetDown() (down sqlite.MigFx)
+	SetTx(tx *sql.Tx)
+	GetTx() (tx *sql.Tx)
+}

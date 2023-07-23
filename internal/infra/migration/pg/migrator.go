@@ -1,4 +1,4 @@
-package sqlite
+package pg
 
 import (
 	"context"
@@ -15,17 +15,22 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vanillazen/stl/backend/internal/infra/db"
-	"github.com/vanillazen/stl/backend/internal/infra/db/sqlite"
-	"github.com/vanillazen/stl/backend/internal/sys"
-	"github.com/vanillazen/stl/backend/internal/sys/config"
-	"github.com/vanillazen/stl/backend/internal/sys/errors"
-	"github.com/vanillazen/stl/backend/internal/sys/uuid"
+	"github.com/google/uuid"
+
+	"github.com/foorester/cook/internal/infra/db"
+	"github.com/foorester/cook/internal/infra/migration"
+	"github.com/foorester/cook/internal/sys"
+	"github.com/foorester/cook/internal/sys/config"
+	"github.com/foorester/cook/internal/sys/errors"
 )
 
 const (
 	migTable = "migrations"
 	migPath  = "assets/migrations/sqlite"
+)
+
+var (
+	cfgKey = config.Key
 )
 
 type (
@@ -36,26 +41,18 @@ type (
 	Migrator struct {
 		sys.Core
 		assetsPath string
+		dbName     string
 		fs         embed.FS
-		db         db.DB
+		db         *sql.DB
 		steps      []Migration
 	}
 
 	// Exec interface.
-	Exec interface {
-		Config(up MigFx, down MigFx)
-		GetIndex() (i int64)
-		GetName() (name string)
-		GetSeeds() (up MigFx)
-		GetDown() (down MigFx)
-		SetTx(tx *sql.Tx)
-		GetTx() (tx *sql.Tx)
-	}
 
 	// Migration struct.
 	Migration struct {
 		Order    int
-		Executor Exec
+		Executor migration.Exec
 	}
 
 	migRecord struct {
@@ -80,12 +77,11 @@ var (
 	matchAllCap   = regexp.MustCompile("([a-z0-9])([A-Z])")
 )
 
-func NewMigrator(fs embed.FS, db db.DB, opts ...sys.Option) (mig *Migrator) {
+func NewMigrator(fs embed.FS, opts ...sys.Option) (mig *Migrator) {
 	m := &Migrator{
 		Core:       sys.NewCore("migrator", opts...),
 		assetsPath: migPath,
 		fs:         fs,
-		db:         db,
 	}
 
 	return m
@@ -99,43 +95,44 @@ func (m *Migrator) AssetsPath() string {
 	return m.assetsPath
 }
 
-func (m *Migrator) DB() *sql.DB {
-	return m.db.DB()
-}
-
 func (m *Migrator) Start(ctx context.Context) error {
-	m.Log().Infof("%s started", m.db.Name())
+	m.Log().Infof("%s started", m.Name())
 
-	err := m.addSteps()
+	err := m.Connect()
 	if err != nil {
 		return errors.Wrapf(err, "%s start error", m.Name())
 	}
 
-	return m.Seed()
+	err = m.addSteps()
+	if err != nil {
+		return errors.Wrapf(err, "%s start error", m.Name())
+	}
+
+	return m.Migrate()
 }
 
 func (m *Migrator) Connect() error {
-	path := m.Cfg().GetString(config.Key.SQLiteFilePath)
-	//sqlDB, err := sql.Open("sqlite3", path)
-	sqlDB, err := sql.Open("sqlite3", path+"?_journal_mode=WAL")
+	pgDB, err := sql.Open("postgres", m.connectionString())
 	if err != nil {
-		return errors.Wrapf(err, "%s connection error", m.db.Name())
+		return errors.Wrapf(err, "%s connection error", m.Name())
 	}
 
-	err = sqlDB.Ping()
+	err = pgDB.Ping()
 	if err != nil {
-		msg := fmt.Sprintf("%s ping connection error", m.db.Name())
+		msg := fmt.Sprintf("%s ping connection error", m.Name())
 		return errors.Wrap(err, msg)
 	}
 
-	m.db = sqlite.NewDB()
-	m.Log().Infof("%s database connected", m.db.Name())
+	m.Log().Infof("%s database connected", m.Name())
+
+	m.db = pgDB
+
 	return nil
 }
 
 // GetTx returns a new transaction from migrator connection
 func (m *Migrator) GetTx() (tx *sql.Tx, err error) {
-	tx, err = m.db.DB().Begin()
+	tx, err = m.db.Begin()
 	if err != nil {
 		return tx, err
 	}
@@ -143,9 +140,16 @@ func (m *Migrator) GetTx() (tx *sql.Tx, err error) {
 	return tx, nil
 }
 
-// PreSetup creates database
-// and migration table if needed.
 func (m *Migrator) PreSetup() (err error) {
+	m.dbName = m.Cfg().GetString(cfgKey.PgDB)
+
+	if !m.dbExists() {
+		err := m.createDB()
+		if err != nil {
+			return err
+		}
+	}
+
 	if !m.migTableExists() {
 		err = m.createMigrationsTable()
 		if err != nil {
@@ -156,11 +160,13 @@ func (m *Migrator) PreSetup() (err error) {
 	return nil
 }
 
-// dbExists returns true if migrator referenced database has been already created.
 func (m *Migrator) dbExists() bool {
-	st := fmt.Sprintf("SELECT name FROM sqlite_master WHERE type='database' AND name='%s';", m.db.Name())
+	dbName := m.Cfg().GetString(cfgKey.PgDB)
 
-	rows, err := m.DB().Query(st)
+	query := `SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('%s')`
+	st := fmt.Sprintf(query, dbName)
+
+	rows, err := m.db.Query(st)
 	if err != nil {
 		m.Log().Infof("Error checking database: %w", err)
 		return false
@@ -182,9 +188,16 @@ func (m *Migrator) dbExists() bool {
 
 // migTableExists returns true if migration table exists.
 func (m *Migrator) migTableExists() bool {
-	st := fmt.Sprintf("SELECT name FROM sqlite_master WHERE type='table' AND name='%s';", migTable)
+	query = `SELECT EXISTS (SELECT 1
+               FROM information_schema.schemata s
+                   JOIN information_schema.tables t
+                       ON t.table_schema = s.schema_name
+               WHERE s.schema_name = '%s'
+                 AND t.table_name = '%s');`
 
-	rows, err := m.DB().Query(st)
+	st := fmt.Sprintf(query, migTable)
+
+	rows, err := m.db.Query(st)
 	if err != nil {
 		m.Log().Errorf("Error checking database: %s", err)
 		return false
@@ -205,23 +218,32 @@ func (m *Migrator) migTableExists() bool {
 	return false
 }
 
-// CreateDb migration.
-func (m *Migrator) CreateDb() (dbPath string, err error) {
-	// NOTE: Not really required for SQLite
-	return m.db.Path(), nil
+func (m *Migrator) createDB() (err error) {
+	err = m.closeAllConnections()
+	if err != nil {
+		return err
+	}
+
+	query := `CREATE DATABASE %s;`
+	st := fmt.Sprintf(query, m.dbName)
+
+	_, err = m.db.Exec(st)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// DropDb migration.
-func (m *Migrator) DropDb() (dbPath string, err error) {
-	dbPath, err = m.CloseAppConns()
+func (m *Migrator) DropDB() (dbPath string, err error) {
+	err = m.closeAllConnections()
 	if err != nil {
 		return dbPath, errors.Wrap(err, "drop db error")
 	}
 
-	// Close the SQLite connection before dropping the database file
-	err = m.DB().Close()
+	err = m.db.Close()
 	if err != nil {
-		m.Log().Errorf("drop dbPath error: %w", err) // Maybe it was already closed.
+		m.Log().Errorf("drop dbPath error: %w", err)
 	}
 
 	err = os.Remove(dbPath)
@@ -232,28 +254,28 @@ func (m *Migrator) DropDb() (dbPath string, err error) {
 	return dbPath, nil
 }
 
-func (m *Migrator) CloseAppConns() (string, error) {
-	dbName := m.Cfg().GetString(config.Key.SQLiteFilePath)
+func (m *Migrator) closeAllConnections() error {
+	cfg := m.Cfg()
+	name := cfg.GetString(cfgKey.PgDB)
+	schema := cfg.GetString(cfgKey.PgSchema)
 
-	err := m.DB().Close()
+	query := `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '%s' 
+                                                         AND pid <> pg_backend_pid()
+                                                         AND EXISTS (
+                                                         SELECT 1
+                                                         FROM pg_namespace n
+                                                             JOIN pg_database d ON d.datnamespace = n.oid
+                                                         WHERE n.nspname = '%s'
+                                                           AND d.datname = '%s');`
+
+	st := fmt.Sprintf(query, name, schema, name)
+
+	_, err := m.db.Exec(st)
 	if err != nil {
-		return dbName, err
+		return err
 	}
 
-	adminConn, err := sql.Open("sqlite3", m.db.Name())
-	if err != nil {
-		return dbName, err
-	}
-	defer adminConn.Close()
-
-	// Terminate all connections to the database (SQLite does not support concurrent connections)
-	st := fmt.Sprintf(`PRAGMA busy_timeout = 5000;`)
-	_, err = adminConn.Exec(st)
-	if err != nil {
-		return dbName, err
-	}
-
-	return dbName, nil
+	return nil
 }
 
 func (m *Migrator) createMigrationsTable() (err error) {
@@ -262,7 +284,13 @@ func (m *Migrator) createMigrationsTable() (err error) {
 		return err
 	}
 
-	st := fmt.Sprintf(createMigrationsTable, migTable)
+	query := `CREATE TABLE %s (id UUID PRIMARY KEY,
+    idx INTEGER,
+    name VARCHAR(64),
+    created_at TEXT
+    );`
+
+	st := fmt.Sprintf(query, migTable)
 
 	_, err = tx.Exec(st)
 	if err != nil {
@@ -276,12 +304,12 @@ func (m *Migrator) createMigrationsTable() (err error) {
 	return tx.Commit()
 }
 
-func (m *Migrator) AddMigration(o int, e Exec) {
+func (m *Migrator) AddMigration(o int, e migration.Exec) {
 	mig := Migration{Order: o, Executor: e}
 	m.steps = append(m.steps, mig)
 }
 
-func (m *Migrator) Seed() (err error) {
+func (m *Migrator) Migrate() (err error) {
 	err = m.PreSetup()
 	if err != nil {
 		return errors.Wrap(err, "migrate error")
@@ -292,7 +320,7 @@ func (m *Migrator) Seed() (err error) {
 		exec := mg.Executor
 		idx := exec.GetIndex()
 		name := exec.GetName()
-		upFx := exec.GetSeeds()
+		upFx := exec.GetUp()
 
 		// Get a new Tx from migrator
 		tx, err := m.GetTx()
@@ -430,7 +458,7 @@ func (m *Migrator) SoftReset() error {
 		return err
 	}
 
-	err = m.Seed()
+	err = m.Migrate()
 	if err != nil {
 		log.Printf("Cannot migrate database: %s", err.Error())
 		return err
@@ -440,18 +468,13 @@ func (m *Migrator) SoftReset() error {
 }
 
 func (m *Migrator) Reset() error {
-	_, err := m.DropDb()
+	_, err := m.DropDB()
 	if err != nil {
 		m.Log().Errorf("Drop database error: %w", err)
 		// Don't return maybe it was not created before.
 	}
 
-	_, err = m.CreateDb()
-	if err != nil {
-		return errors.Wrap(err, "create database error")
-	}
-
-	err = m.Seed()
+	err = m.Migrate()
 	if err != nil {
 		return errors.Wrap(err, "drop database error")
 	}
@@ -459,13 +482,17 @@ func (m *Migrator) Reset() error {
 	return nil
 }
 
-func (m *Migrator) recMigration(e Exec) error {
-	st := fmt.Sprintf(insertIntoMigrations, migTable)
+func (m *Migrator) recMigration(e migration.Exec) error {
+	query := `INSERT INTO %s (id, idx, name, created_at) VALUES (:id, :idx, :name, :created_at);`
+	st := fmt.Sprintf(query, migTable)
 
-	uid := uuid.NewUUID()
+	uid, err := uuid.NewUUID()
+	if err != nil {
+		return errors.Wrap(err, "cannot update migration table")
+	}
 
-	_, err := e.GetTx().Exec(st,
-		ToNullString(uid.Val),
+	_, err = e.GetTx().Exec(st,
+		ToNullString(uid.String()),
 		ToNullInt64(e.GetIndex()),
 		ToNullString(e.GetName()),
 		ToNullString(time.Now().Format(time.RFC3339)),
@@ -479,7 +506,8 @@ func (m *Migrator) recMigration(e Exec) error {
 }
 
 func (m *Migrator) cancelRollback(index int64, name string, tx *sql.Tx) bool {
-	st := fmt.Sprintf(selectFromMigrations, migTable, index, name)
+	query := `SELECT (COUNT(*) > 0) AS record_exists FROM %s WHERE idx = %d AND name = '%s'`
+	st := fmt.Sprintf(query, migTable, index, name)
 	r, err := tx.Query(st)
 
 	if err != nil {
@@ -502,7 +530,9 @@ func (m *Migrator) cancelRollback(index int64, name string, tx *sql.Tx) bool {
 }
 
 func (m *Migrator) canApplyMigration(index int64, name string, tx *sql.Tx) bool {
-	st := fmt.Sprintf(selectFromMigrations, migTable, index, name)
+	query := `SELECT (COUNT(*) > 0) AS record_exists FROM %s WHERE idx = %d AND name = '%s'`
+	st := fmt.Sprintf(query, migTable, index, name)
+
 	r, err := tx.Query(st)
 	defer r.Close()
 
@@ -529,13 +559,14 @@ func (m *Migrator) canApplyRollback(index int64, name string, tx *sql.Tx) bool {
 	return !m.canApplyMigration(index, name, tx)
 }
 
-func (m *Migrator) delMigration(e Exec) error {
+func (m *Migrator) delMigration(e migration.Exec) error {
 	idx := e.GetIndex()
 	name := e.GetName()
 
-	st := fmt.Sprintf(deleteFromMigrations, migTable, idx, name)
-	_, err := e.GetTx().Exec(st)
+	query := `DELETE FROM %s WHERE idx = %d AND name = '%s'`
+	st := fmt.Sprintf(query, migTable, idx, name)
 
+	_, err := e.GetTx().Exec(st)
 	if err != nil {
 		return errors.Wrap(err, "cannot delete migration table record")
 	}
@@ -669,6 +700,27 @@ func ToNullTime(t time.Time) db.NullTime {
 		Time:  t,
 		Valid: true,
 	}
+}
+
+func (m *Migrator) connectionString() (connString string) {
+	cfg := m.Cfg()
+	user := cfg.GetString(cfgKey.PgUser)
+	pass := cfg.GetString(cfgKey.PgPass)
+	name := cfg.GetString(cfgKey.PgDB)
+	host := cfg.GetString(cfgKey.PgHost)
+	port := cfg.GetInt(cfgKey.PgPort)
+	schema := cfg.GetString(cfgKey.PgSchema)
+	sslMode := cfg.GetBool(cfgKey.PgSSL)
+
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d search_path=%s", user, pass, name, host, port, schema)
+
+	if sslMode {
+		connStr = connStr + " sslmode=disable"
+	} else {
+		connStr = connStr + " sslmode=disable"
+	}
+
+	return connStr
 }
 
 func ToNullString(s string) sql.NullString {
