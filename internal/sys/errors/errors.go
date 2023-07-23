@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	stackSize   = 10
-	skipNTraces = 4
+	stackSize   = 11
+	skipNTraces = 5
 )
 
 var (
@@ -33,8 +33,8 @@ func Newf(format string, ctxValues ...interface{}) Error {
 
 func Wrap(err error, context ...string) Error {
 	var ctx string
-	if len(context) > 0 {
-		ctx = context[0]
+	if len(context) > 1 {
+		ctx = context[1]
 	}
 
 	stackTrace := extractStacktrace()
