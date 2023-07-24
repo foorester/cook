@@ -6,7 +6,7 @@ direnv:
 
 .PHONY: build
 build:
-	go build cmd/cook/main.go
+	go build main.go
 
 .PHONY: run
 run:

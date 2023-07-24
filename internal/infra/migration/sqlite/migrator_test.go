@@ -10,15 +10,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/vanillazen/stl/backend/internal/infra/db"
-	"github.com/vanillazen/stl/backend/internal/infra/db/sqlite"
-	migrator "github.com/vanillazen/stl/backend/internal/infra/migration"
-	"github.com/vanillazen/stl/backend/internal/sys"
-	"github.com/vanillazen/stl/backend/internal/sys/config"
-	l "github.com/vanillazen/stl/backend/internal/sys/log"
-	"github.com/vanillazen/stl/backend/internal/sys/test"
-
 	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/foorester/cook/internal/infra/db"
+	"github.com/foorester/cook/internal/sys"
+	"github.com/foorester/cook/internal/sys/config"
+	l "github.com/foorester/cook/internal/sys/log"
 )
 
 const (

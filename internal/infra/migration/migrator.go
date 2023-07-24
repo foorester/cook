@@ -3,7 +3,6 @@ package migration
 import (
 	"database/sql"
 
-	"github.com/foorester/cook/internal/infra/migration/sqlite"
 	"github.com/foorester/cook/internal/sys"
 )
 
@@ -27,12 +26,14 @@ type (
 	}
 )
 
+type MigFx = func(tx *sql.Tx) error
+
 type Exec interface {
-	Config(up sqlite.MigFx, down sqlite.MigFx)
+	Config(up MigFx, down MigFx)
 	GetIndex() (i int64)
 	GetName() (name string)
-	GetUp() (up sqlite.MigFx)
-	GetDown() (down sqlite.MigFx)
+	GetUp() (up MigFx)
+	GetDown() (down MigFx)
 	SetTx(tx *sql.Tx)
 	GetTx() (tx *sql.Tx)
 }
