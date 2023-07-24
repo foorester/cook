@@ -1,22 +1,18 @@
-package sqlite
+package pg
 
-import (
-	"database/sql"
-
-	"github.com/foorester/cook/internal/infra/migration"
-)
+import "database/sql"
 
 type (
 	step struct {
 		Index int64
 		Name  string
-		Up    migration.MigFx
-		Down  migration.MigFx
+		Up    MigFx
+		Down  MigFx
 		tx    *sql.Tx
 	}
 )
 
-func (s *step) Config(up migration.MigFx, down migration.MigFx) {
+func (s *step) Config(up MigFx, down MigFx) {
 	s.Up = up
 	s.Down = down
 }
@@ -29,11 +25,11 @@ func (s *step) GetName() (name string) {
 	return s.Name
 }
 
-func (s *step) GetUp() (up migration.MigFx) {
+func (s *step) GetUp() (up MigFx) {
 	return s.Up
 }
 
-func (s *step) GetDown() (down migration.MigFx) {
+func (s *step) GetDown() (down MigFx) {
 	return s.Down
 }
 

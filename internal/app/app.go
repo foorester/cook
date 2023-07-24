@@ -2,12 +2,15 @@ package app
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"sync"
 
 	"github.com/foorester/cook/internal/domain/service"
 	"github.com/foorester/cook/internal/infra/db/pgx"
 	http2 "github.com/foorester/cook/internal/infra/http"
+	"github.com/foorester/cook/internal/infra/migration"
+	"github.com/foorester/cook/internal/infra/migration/pg"
 	pgxr "github.com/foorester/cook/internal/infra/repo/sqlc"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/config"
@@ -19,9 +22,11 @@ type App struct {
 	sync.Mutex
 	sys.Core
 	opts       []sys.Option
+	migFs      embed.FS
 	supervisor sys.Supervisor
 	http       *http2.Server
 	svc        service.RecipeService
+	migrator   migration.Migrator
 }
 
 func NewApp(name string, log log.Logger) (app *App, err error) {
@@ -43,6 +48,10 @@ func NewApp(name string, log log.Logger) (app *App, err error) {
 	return app, nil
 }
 
+func (app *App) SetMigratorFs(fs embed.FS) {
+	app.migFs = fs
+}
+
 func (app *App) Run() (err error) {
 	ctx := context.Background()
 
@@ -56,6 +65,9 @@ func (app *App) Run() (err error) {
 
 func (app *App) Setup(ctx context.Context) error {
 	app.EnableSupervisor()
+
+	// Migration
+	app.migrator = pg.NewMigrator(app.migFs, app.opts...)
 
 	// Databases
 	dbase := pgx.NewDB(app.opts...)

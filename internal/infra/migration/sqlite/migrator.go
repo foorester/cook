@@ -31,7 +31,6 @@ const (
 
 type (
 	// MigFx type alias
-	MigFx = func(tx *sql.Tx) error
 
 	// Migrator struct.
 	Migrator struct {

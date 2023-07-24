@@ -10,9 +10,10 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v5 v5.4.1
 	github.com/lib/pq v1.2.0
+	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/spf13/viper v1.16.0
 	go.mongodb.org/mongo-driver v1.11.6
-	golang.org/x/sync v0.2.0
+	golang.org/x/sync v0.3.0
 	google.golang.org/grpc v1.55.0
 )
 

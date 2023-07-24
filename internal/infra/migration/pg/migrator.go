@@ -188,7 +188,7 @@ func (m *Migrator) dbExists() bool {
 
 // migTableExists returns true if migration table exists.
 func (m *Migrator) migTableExists() bool {
-	query = `SELECT EXISTS (SELECT 1
+	query := `SELECT EXISTS (SELECT 1
                FROM information_schema.schemata s
                    JOIN information_schema.tables t
                        ON t.table_schema = s.schema_name
