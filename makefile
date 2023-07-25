@@ -10,7 +10,7 @@ build:
 
 .PHONY: run
 run:
-	go run ./cmd/$(app)/main.go --config-file=configs/config.yml
+	go run ./main.go --config-file=configs/config.yml
 
 # OpenAPI
 .PHONY: openapihttp
@@ -21,8 +21,8 @@ openapihttp:
 	oapi-codegen -generate types -o internal/client/openapi/cooktypes.go -package openapi api/openapi/cook.yaml
 	oapi-codegen -generate client -o internal/client/openapi/cookapi.go -package openapi api/openapi/cook.yaml
 
-.PHONY: gensqlcpg
-gensqlcpg:
+.PHONY: sqlc/gen
+sqlc/gen:
 	sqlc generate -f ./configs/sqlc/pg.sqlc.yaml
 
 .PHONY: pgall
@@ -34,29 +34,29 @@ pgall:
 	cat /home/adrian/Projects/labs/foorester/cook/scripts/sql/pg/migrations/*.sql > pgall.sql
 	mv pgall.sql /tmp
 
-# API Call
+# API Calls
 # CURL
-.PHONY: create-book
-create-book:
+.PHONY: api/create-book
+api/create-book:
 	./scripts/curl/create-book.sh -h localhost -p 8080 -n "Recipe Book One" -d "Favorite Recipes"
 
 # Testing
-.PHONY: installgomock
-installgomock:
+.PHONY: install/gomock
+install/gomock:
 	go install github.com/golang/mock/mockgen@v1.6.0
 
-.PHONY: genportmocks
-genportmocks:
+.PHONY: mock/gen-ports
+mock/gen-ports:
 	# gomock is required (make installgomock)
 	mockgen -source=internal/domain/port/repo.go -destination=internal/infra/repo/pgx/repo_mock_test.go -package=pgx_test
 
 # Docker
-.PHONY: docker-dev
-docker-dev:
+.PHONY: docker/dev
+docker/dev:
 	docker build . -t ak -f deployments/docker/dev/Dockerfile
 
-.PHONY: docker-compose
-docker-compose:
+.PHONY: docker/compose-up
+docker/compose-up:
 	# Run with sudo or, better, setup appropriate user permissions
 	rm -rf tmp/postgres-data
 	mkdir -p tmp/postgres-data
@@ -65,16 +65,16 @@ docker-compose:
 	cp scripts/sql/docker/2023062300-initial-setup.sql tmp/sql
 	docker-compose -f ./deployments/docker/dev/docker-compose.yml up --build # --abort-on-container-exit --remove-orphans
 
-.PHONY: docker-compose-down
-docker-compose-down:
+.PHONY: docker/compose-down
+docker/compose-down:
 	docker-compose -f deployments/docker/dev/docker-compose.yml down
 
-.PHONY: docker-reset-pg
-docker-rest-pg:
+.PHONY: docker/reset-pg
+docker/rest-pg:
 	rm -rf tmp/postgres-data
 
-.PHONY: docker-psql
-docker-psql:
+.PHONY: docker/psql
+docker/psql:
 	sudo rm -rf ./tmp/postgres-data
 
 # Testing
@@ -82,6 +82,6 @@ docker-psql:
 test:
 	make -f makefile.test test-selected
 
-.PHONY: docker-test
-docker-test:
+.PHONY: docker/test
+docker/test:
 	make -f makefile.test compose-test
