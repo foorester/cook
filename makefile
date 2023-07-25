@@ -47,7 +47,7 @@ install/gomock:
 
 .PHONY: mock/gen-ports
 mock/gen-ports:
-	# gomock is required (make installgomock)
+	# gomock is required (make install/gomock)
 	mockgen -source=internal/domain/port/repo.go -destination=internal/infra/repo/pgx/repo_mock_test.go -package=pgx_test
 
 # Docker
