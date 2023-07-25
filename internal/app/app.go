@@ -101,7 +101,12 @@ func (app *App) Start(ctx context.Context) error {
 	app.Log().Infof("%s starting...", app.Name())
 	defer app.Log().Infof("%s stopped", app.Name())
 
-	err := app.svc.Start(ctx)
+	err := app.migrator.Start(ctx)
+	if err != nil {
+		return errors.Wrap(err, "app start error")
+	}
+
+	err = app.svc.Start(ctx)
 	if err != nil {
 		return errors.Wrap(err, "app start error")
 	}

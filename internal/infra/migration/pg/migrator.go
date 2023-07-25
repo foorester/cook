@@ -42,6 +42,7 @@ type (
 		sys.Core
 		assetsPath string
 		dbName     string
+		schema     string
 		fs         embed.FS
 		db         *sql.DB
 		steps      []Migration
@@ -98,6 +99,9 @@ func (m *Migrator) AssetsPath() string {
 func (m *Migrator) Start(ctx context.Context) error {
 	m.Log().Infof("%s started", m.Name())
 
+	m.dbName = m.Cfg().GetString(cfgKey.PgDB)
+	m.schema = m.Cfg().GetString(cfgKey.PgSchema)
+
 	err := m.Connect()
 	if err != nil {
 		return errors.Wrapf(err, "%s start error", m.Name())
@@ -141,8 +145,6 @@ func (m *Migrator) GetTx() (tx *sql.Tx, err error) {
 }
 
 func (m *Migrator) PreSetup() (err error) {
-	m.dbName = m.Cfg().GetString(cfgKey.PgDB)
-
 	if !m.dbExists() {
 		err := m.createDB()
 		if err != nil {
@@ -161,10 +163,8 @@ func (m *Migrator) PreSetup() (err error) {
 }
 
 func (m *Migrator) dbExists() bool {
-	dbName := m.Cfg().GetString(cfgKey.PgDB)
-
 	query := `SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('%s')`
-	st := fmt.Sprintf(query, dbName)
+	st := fmt.Sprintf(query, m.dbName)
 
 	rows, err := m.db.Query(st)
 	if err != nil {
@@ -172,7 +172,6 @@ func (m *Migrator) dbExists() bool {
 		return false
 	}
 	defer rows.Close()
-
 	for rows.Next() {
 		var dbName string
 		err = rows.Scan(&dbName)
@@ -195,7 +194,7 @@ func (m *Migrator) migTableExists() bool {
                WHERE s.schema_name = '%s'
                  AND t.table_name = '%s');`
 
-	st := fmt.Sprintf(query, migTable)
+	st := fmt.Sprintf(query, m.schema, migTable)
 
 	rows, err := m.db.Query(st)
 	if err != nil {
@@ -205,14 +204,14 @@ func (m *Migrator) migTableExists() bool {
 	defer rows.Close()
 
 	for rows.Next() {
-		var tableName string
-		err = rows.Scan(&tableName)
+		var exists bool
+		err = rows.Scan(&exists)
 		if err != nil {
 			m.Log().Errorf("Cannot read query result: %s\n", err)
 			return false
 		}
 
-		return true
+		return exists
 	}
 
 	return false
@@ -255,10 +254,6 @@ func (m *Migrator) DropDB() (dbPath string, err error) {
 }
 
 func (m *Migrator) closeAllConnections() error {
-	cfg := m.Cfg()
-	name := cfg.GetString(cfgKey.PgDB)
-	schema := cfg.GetString(cfgKey.PgSchema)
-
 	query := `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '%s' 
                                                          AND pid <> pg_backend_pid()
                                                          AND EXISTS (
@@ -268,7 +263,7 @@ func (m *Migrator) closeAllConnections() error {
                                                          WHERE n.nspname = '%s'
                                                            AND d.datname = '%s');`
 
-	st := fmt.Sprintf(query, name, schema, name)
+	st := fmt.Sprintf(query, m.dbName, m.schema, m.dbName)
 
 	_, err := m.db.Exec(st)
 	if err != nil {
@@ -483,7 +478,7 @@ func (m *Migrator) Reset() error {
 }
 
 func (m *Migrator) recMigration(e migration.Exec) error {
-	query := `INSERT INTO %s (id, idx, name, created_at) VALUES (:id, :idx, :name, :created_at);`
+	query := `INSERT INTO %s (id, idx, name, created_at) VALUES ($1, $2, $3, $4);`
 	st := fmt.Sprintf(query, migTable)
 
 	uid, err := uuid.NewUUID()
@@ -491,11 +486,17 @@ func (m *Migrator) recMigration(e migration.Exec) error {
 		return errors.Wrap(err, "cannot update migration table")
 	}
 
+	fmt.Println(st)
+	fmt.Println(uid.String())
+	fmt.Println(e.GetIndex())
+	fmt.Println(e.GetName())
+
 	_, err = e.GetTx().Exec(st,
 		ToNullString(uid.String()),
 		ToNullInt64(e.GetIndex()),
 		ToNullString(e.GetName()),
-		ToNullString(time.Now().Format(time.RFC3339)),
+		//ToNullString(time.Now().Format(time.RFC3339)),
+		ToNullTime(time.Now()),
 	)
 
 	if err != nil {
