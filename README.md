@@ -24,12 +24,14 @@ Finally, we recognize the significance of Test-driven development (TDD) principl
 ```shell
 $ make run 
 go run ./cmd/cook/main.go
-[INF] 2023/06/23 12:01:16 cook starting...
-[INF] 2023/06/23 12:01:16 user=cook password=cook dbname=foorester host=127.0.0.1 port=5432 search_path=cook
-[INF] 2023/06/23 12:01:16 sqlc-db database connected!
-[INF] 2023/06/23 12:01:16 cook started!
-[INF] 2023/06/23 12:01:16 http-server started listening at localhost:8080
-
+[INF] 2023/07/25 20:00:43 cook starting...
+[INF] 2023/07/25 20:00:43 migrator started
+[INF] 2023/07/25 20:00:43 migrator database connected
+[INF] 2023/07/25 20:00:43 Migration 'users' already applied
+[INF] 2023/07/25 20:00:43 user=cook password=cook dbname=foorester host=localhost port=5432 search_path=cook
+[INF] 2023/07/25 20:00:43 sqlc-db database connected!
+[INF] 2023/07/25 20:00:43 cook started!
+[INF] 2023/07/25 20:00:43 http-server started listening at localhost:8080
 ```
 
 Make a `create-book` request in another terminal
