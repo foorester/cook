@@ -75,7 +75,7 @@ func (db *DB) connString() (connString string) {
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d search_path=%s", user, pass, name, host, port, schema)
 
 	if sslMode {
-		connStr = connStr + " sslmode=disable"
+		connStr = connStr + " sslmode=enable"
 	} else {
 		connStr = connStr + " sslmode=disable"
 	}
