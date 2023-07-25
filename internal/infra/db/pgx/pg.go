@@ -86,7 +86,7 @@ func (db *DB) connString() (connString string) {
 	db.Log().Infof(connStr)
 
 	if sslMode {
-		connStr = connStr + " sslmode=disable"
+		connStr = connStr + " sslmode=enable"
 	} else {
 		connStr = connStr + " sslmode=disable"
 	}
