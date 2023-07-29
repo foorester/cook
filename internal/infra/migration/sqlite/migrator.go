@@ -107,7 +107,7 @@ func (m *Migrator) Start(ctx context.Context) error {
 
 func (m *Migrator) Connect() error {
 	path := m.Cfg().GetString(config.Key.SQLiteFilePath)
-	//sqlDB, err := sql.Open("sqlite3", path)
+
 	sqlDB, err := sql.Open("sqlite3", path+"?_journal_mode=WAL")
 	if err != nil {
 		return errors.Wrapf(err, "%s connection error", m.Name())
