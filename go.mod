@@ -7,7 +7,6 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/golang/mock v1.6.0
-	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v5 v5.4.1
 	github.com/lib/pq v1.2.0
 	github.com/mattn/go-sqlite3 v1.14.17
