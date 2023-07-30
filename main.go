@@ -10,7 +10,7 @@ import (
 
 const (
 	name     = "cook"
-	logLevel = "info"
+	logLevel = "debug"
 )
 
 var (

@@ -20,7 +20,7 @@ The ability to validate JWT tokens is planned.
 
 There will be a separate code generator repository that utilizes Cook as a foundation for creating simple RESTful microservices specifically tailored for managing an intrinsically related group of resources (list-item, recipe-ingredient-directions, course-students, etc). The [code generator](https://github.com/foorester/crud) will provide developers with the ability to quickly generate the basic structure and functionality and extended later if required.
 
-This code generator offers the flexibility to enable essential features for your project, such as SSR, Isomorphic client, user authentication, persistence engines, and more, while avoiding the inclusion of unused code in the application.While the generated code will be optimized for managing a small set of resources, developers will be not limited to this constraints and will be able to adapt and modify the generated code to suit their specific and more complex use cases.
+This code generator will offer the flexibility to enable essential features for your project, such as SSR, Isomorphic client, user authentication, persistence engines, and more, while avoiding the inclusion of unused code in the application.While the generated code will be optimized for managing a small set of resources, developers will be not limited to this constraints and will be able to adapt and modify the generated code to suit their specific and more complex use cases.
 
 Finally, we recognize the significance of Test-driven development (TDD) principles. As the project's structure solidifies, our intention is to achieve comprehensive test coverage, addressing every aspect thoroughly.
 
@@ -31,17 +31,21 @@ Finally, we recognize the significance of Test-driven development (TDD) principl
 $ make run 
 go run ./cmd/cook/main.go
 go run ./main.go --config-file=configs/config.yml
-[INF] 2023/07/30 11:00:06 cook starting...
-[INF] 2023/07/30 11:00:06 migrator started
-[INF] 2023/07/30 11:00:06 migrator database connected
-[INF] 2023/07/30 11:00:06 Migration 'users' already applied
-[INF] 2023/07/30 11:00:06 seeder started
-[INF] 2023/07/30 11:00:06 seeder database connected
-[INF] 2023/07/30 11:00:06 Seed 'users' already applied
-[DBG] 2023/07/30 11:00:06 user=cook password=cook dbname=foorester host=localhost port=5432 search_path=cook
-[INF] 2023/07/30 11:00:06 sqlc-db database connected!
-[INF] 2023/07/30 11:00:06 cook started!
-[INF] 2023/07/30 11:00:06 http-server started listening at localhost:8080
+[INF] 2023/07/30 19:24:51 cook starting...
+[INF] 2023/07/30 19:24:51 migrator started
+[INF] 2023/07/30 19:24:51 migrator database connected
+[INF] 2023/07/30 19:24:51 Migration 'users' already applied
+[INF] 2023/07/30 19:24:51 Migration 'books' already applied
+[INF] 2023/07/30 19:24:51 Migration 'recipes' already applied
+[INF] 2023/07/30 19:24:51 Migration 'ingredients' already applied
+[INF] 2023/07/30 19:24:51 Migration 'steps' already applied
+[INF] 2023/07/30 19:24:51 seeder started
+[INF] 2023/07/30 19:24:51 seeder database connected
+[INF] 2023/07/30 19:24:51 Seed 'users' already applied
+[DBG] 2023/07/30 19:24:51 user=cook password=cook dbname=foorester host=localhost port=5432 search_path=cook
+[INF] 2023/07/30 19:24:51 sqlc-db database connected!
+[INF] 2023/07/30 19:24:51 cook started!
+[INF] 2023/07/30 19:24:51 http-server started listening at localhost:8080
 ```
 
 Make a `create-book` request in another terminal
@@ -52,7 +56,7 @@ $ make create-book
 
 See the output
 ```shell
-[DBG] 2023/06/23 12:01:51 ts: 2023/06/23 10:01:51, req-id: perun/uSr1bEITXA-000001, scheme: http, proto: HTTP/1.1, method: POST, addr: 127.0.0.1:37606, agent: curl/8.1.0, uri: http://localhost:8080/api/v1/books, status: 0, bytes: 0, elapsed: 0.470759ms
+[DBG] 2023/07/30 19:25:08 ts: 2023/06/23 10:01:51, req-id: perun/uSr1bEITXA-000001, scheme: http, proto: HTTP/1.1, method: POST, addr: 127.0.0.1:37606, agent: curl/8.1.0, uri: http://localhost:8080/api/v1/books, status: 0, bytes: 0, elapsed: 0.470759ms
 ```
 
 
