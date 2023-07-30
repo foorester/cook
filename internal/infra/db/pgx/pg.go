@@ -83,7 +83,7 @@ func (db *DB) connString() (connString string) {
 	sslMode := cfg.GetBool(cfgKey.PgSSL)
 
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d search_path=%s", user, pass, name, host, port, schema)
-	db.Log().Infof(connStr)
+	db.Log().Debugf(connStr)
 
 	if sslMode {
 		connStr = connStr + " sslmode=enable"
