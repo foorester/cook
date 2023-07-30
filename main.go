@@ -14,8 +14,11 @@ const (
 )
 
 var (
-	//go:embed all:assets/migrations/sqlite/*.sql
+	//go:embed all:assets/migrations/pg/*.sql
 	migFs embed.FS
+
+	//go:embed all:assets/seeding/pg/*.sql
+	seedFs embed.FS
 )
 
 var (
@@ -29,7 +32,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	app.SetMigratorFs(migFs)
+	app.SetMigrationsFs(migFs)
+	app.SetSeedingFs(seedFs)
 
 	err = app.Run()
 	if err != nil {
