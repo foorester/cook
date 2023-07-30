@@ -10,8 +10,10 @@ import (
 	"github.com/foorester/cook/internal/infra/db/pgx"
 	http2 "github.com/foorester/cook/internal/infra/http"
 	"github.com/foorester/cook/internal/infra/migration"
-	"github.com/foorester/cook/internal/infra/migration/pg"
+	mig "github.com/foorester/cook/internal/infra/migration/pg"
 	pgxr "github.com/foorester/cook/internal/infra/repo/sqlc"
+	"github.com/foorester/cook/internal/infra/seeding"
+	seed "github.com/foorester/cook/internal/infra/seeding/pg"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/config"
 	"github.com/foorester/cook/internal/sys/errors"
@@ -23,10 +25,12 @@ type App struct {
 	sys.Core
 	opts       []sys.Option
 	migFs      embed.FS
+	seedFs     embed.FS
 	supervisor sys.Supervisor
 	http       *http2.Server
 	svc        service.RecipeService
 	migrator   migration.Migrator
+	seeder     seeding.Seeder
 }
 
 func NewApp(name string, log log.Logger) (app *App, err error) {
@@ -48,8 +52,12 @@ func NewApp(name string, log log.Logger) (app *App, err error) {
 	return app, nil
 }
 
-func (app *App) SetMigratorFs(fs embed.FS) {
+func (app *App) SetMigrationsFs(fs embed.FS) {
 	app.migFs = fs
+}
+
+func (app *App) SetSeedingFs(fs embed.FS) {
+	app.seedFs = fs
 }
 
 func (app *App) Run() (err error) {
@@ -66,8 +74,11 @@ func (app *App) Run() (err error) {
 func (app *App) Setup(ctx context.Context) error {
 	app.EnableSupervisor()
 
-	// Migration
-	app.migrator = pg.NewMigrator(app.migFs, app.opts...)
+	// Migrator
+	app.migrator = mig.NewMigrator(app.migFs, app.opts...)
+
+	// Seeder
+	app.seeder = seed.NewSeeder(app.seedFs, app.opts...)
 
 	// Databases
 	dbase := pgx.NewDB(app.opts...)
@@ -101,7 +112,14 @@ func (app *App) Start(ctx context.Context) error {
 	app.Log().Infof("%s starting...", app.Name())
 	defer app.Log().Infof("%s stopped", app.Name())
 
-	err := app.migrator.Start(ctx)
+	var err error
+
+	err = app.migrator.Start(ctx)
+	if err != nil {
+		return errors.Wrap(err, "app start error")
+	}
+
+	err = app.seeder.Start(ctx)
 	if err != nil {
 		return errors.Wrap(err, "app start error")
 	}

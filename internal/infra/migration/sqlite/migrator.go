@@ -464,6 +464,7 @@ func (m *Migrator) recMigration(e migration.Exec) error {
 	)
 
 	if err != nil {
+		m.Log().Error(err)
 		return errors.Wrap(err, "cannot update migration table")
 	}
 

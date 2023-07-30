@@ -16,7 +16,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/foorester/cook/internal/infra/db"
-	"github.com/foorester/cook/internal/infra/seed"
+	"github.com/foorester/cook/internal/infra/seeding"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/config"
 	"github.com/foorester/cook/internal/sys/errors"
@@ -40,7 +40,7 @@ type (
 	// Seed struct
 	Seed struct {
 		Order    int
-		Executor seed.Exec
+		Executor seeding.Exec
 	}
 
 	seedRecord struct {
@@ -121,8 +121,8 @@ func (s *Seeder) Connect() error {
 }
 
 // GetTx returns a new transaction from seeder connection
-func (m *Seeder) GetTx() (tx *sql.Tx, err error) {
-	tx, err = m.db.Begin()
+func (s *Seeder) GetTx() (tx *sql.Tx, err error) {
+	tx, err = s.db.Begin()
 	if err != nil {
 		return tx, err
 	}
@@ -167,7 +167,7 @@ func (s *Seeder) dbExists() bool {
 	return false
 }
 
-// seedsTableExists returns true if seed table exists.
+// seedsTableExists returns true if seeding table exists.
 func (s *Seeder) seedsTableExists() bool {
 	st := fmt.Sprintf("SELECT name FROM sqlite_master WHERE type='table' AND name='%s';", seedTable)
 
@@ -243,7 +243,7 @@ func (s *Seeder) createSeedsTable() (err error) {
 	return tx.Commit()
 }
 
-func (s *Seeder) AddSeed(o int, e seed.Exec) {
+func (s *Seeder) AddSeed(o int, e seeding.Exec) {
 	mig := Seed{Order: o, Executor: e}
 	s.steps = append(s.steps, mig)
 }
@@ -282,22 +282,22 @@ func (s *Seeder) Seed() (err error) {
 		}
 
 		if err != nil {
-			s.Log().Infof("%s seed not executed", name)
+			s.Log().Infof("%s seeding not executed", name)
 			err2 := tx.Rollback()
 			if err2 != nil {
 				return errors.Wrap(err2, "seeding rollback error")
 			}
 
-			return errors.Wrapf(err, "cannot run seed '%s'", name)
+			return errors.Wrapf(err, "cannot run seeding '%s'", name)
 		}
 
-		// Register seed
+		// Register seeding
 		exec.SetTx(tx)
 		err = s.recSeed(exec)
 
 		err = tx.Commit()
 		if err != nil {
-			msg := fmt.Sprintf("Cannot update seed table: %s\n", err.Error())
+			msg := fmt.Sprintf("Cannot update seeding table: %s\n", err.Error())
 			s.Log().Errorf("seeding commit error: %s", msg)
 			err = tx.Rollback()
 			if err != nil {
@@ -312,14 +312,14 @@ func (s *Seeder) Seed() (err error) {
 	return nil
 }
 
-func (s *Seeder) recSeed(e seed.Exec) error {
+func (s *Seeder) recSeed(e seeding.Exec) error {
 	query := `INSERT INTO %s (id, idx, n VALUES (:id, :idx, :name, :created_at);`
 
 	st := fmt.Sprintf(query, seedTable)
 
 	uid, err := uuid.NewUUID()
 	if err != nil {
-		return errors.Wrap(err, "cannot update seed table")
+		return errors.Wrap(err, "cannot update seeding table")
 	}
 
 	_, err = e.GetTx().Exec(st,
@@ -330,7 +330,8 @@ func (s *Seeder) recSeed(e seed.Exec) error {
 	)
 
 	if err != nil {
-		return errors.Wrap(err, "cannot update seed table")
+		s.Log().Error(err)
+		return errors.Wrap(err, "cannot update seeding table")
 	}
 
 	return nil
@@ -353,7 +354,7 @@ func (s *Seeder) cancelRollback(index int64, name string, tx *sql.Tx) bool {
 		var applied sql.NullBool
 		err = r.Scan(&applied)
 		if err != nil {
-			s.Log().Errorf("Cannot determine seed status: %w", err)
+			s.Log().Errorf("Cannot determine seeding status: %w", err)
 			return true
 		}
 
@@ -373,7 +374,7 @@ func (s *Seeder) canApplySeed(index int64, name string, tx *sql.Tx) bool {
 	defer r.Close()
 
 	if err != nil {
-		s.Log().Errorf("Cannot determine seed status: %w", err)
+		s.Log().Errorf("Cannot determine seeding status: %w", err)
 		return false
 	}
 
@@ -381,7 +382,7 @@ func (s *Seeder) canApplySeed(index int64, name string, tx *sql.Tx) bool {
 		var exists sql.NullBool
 		err = r.Scan(&exists)
 		if err != nil {
-			s.Log().Errorf("Cannot determine seed status: %s", err)
+			s.Log().Errorf("Cannot determine seeding status: %s", err)
 			return false
 		}
 
@@ -398,12 +399,12 @@ func (s *Seeder) addSteps() error {
 	}
 
 	for i, q := range qq {
-		var seeds []seed.SeedFx
+		var seeds []seeding.SeedFx
 		for _, i := range q.Inserts {
 			seeds = append(seeds, s.genTxExecFunc(i))
 		}
 
-		step := &step{
+		step := &seeding.Step{
 			Index: q.Index,
 			Name:  q.Name,
 			Seeds: seeds,
@@ -450,7 +451,7 @@ func (s *Seeder) readInsertSets() ([]insertSet, error) {
 		var statements []string
 		insertStmts := strings.Split(string(content), "--SEED")
 		if len(insertStmts) < 1 {
-			msg := fmt.Sprintf("invalid seed file format: %s", file.Name())
+			msg := fmt.Sprintf("invalid seeding file format: %s", file.Name())
 			return nil, errors.New(msg)
 		}
 

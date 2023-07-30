@@ -26,7 +26,7 @@ import (
 
 const (
 	migTable = "migrations"
-	migPath  = "assets/migrations/sqlite"
+	migPath  = "assets/migrations/pg"
 )
 
 var (
@@ -486,20 +486,15 @@ func (m *Migrator) recMigration(e migration.Exec) error {
 		return errors.Wrap(err, "cannot update migration table")
 	}
 
-	fmt.Println(st)
-	fmt.Println(uid.String())
-	fmt.Println(e.GetIndex())
-	fmt.Println(e.GetName())
-
 	_, err = e.GetTx().Exec(st,
 		ToNullString(uid.String()),
 		ToNullInt64(e.GetIndex()),
 		ToNullString(e.GetName()),
-		//ToNullString(time.Now().Format(time.RFC3339)),
 		ToNullTime(time.Now()),
 	)
 
 	if err != nil {
+		m.Log().Error(err)
 		return errors.Wrap(err, "cannot update migration table")
 	}
 
