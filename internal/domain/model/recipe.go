@@ -8,6 +8,7 @@ type (
 		Book        Book
 		Ingredients []Ingredient
 		Steps       []Step
+		Audit
 	}
 
 	Ingredient struct {
@@ -17,6 +18,7 @@ type (
 		Recipe      Recipe
 		Qty         string // string for now, type may change
 		Unit        string // string for now, type may change
+		Audit
 	}
 
 	Step struct {
@@ -25,5 +27,6 @@ type (
 		Description string
 		Recipe      Recipe
 		Duration    string // string for now, type may change
+		Audit
 	}
 )
