@@ -46,9 +46,6 @@ type Step struct {
 // StepList defines model for StepList.
 type StepList = []Step
 
-// PostBookJSONRequestBody defines body for PostBook for application/json ContentType.
-type PostBookJSONRequestBody = Book
-
 // PutBookJSONRequestBody defines body for PutBook for application/json ContentType.
 type PutBookJSONRequestBody = Book
 
@@ -69,3 +66,6 @@ type PostStepJSONRequestBody = Step
 
 // PutStepJSONRequestBody defines body for PutStep for application/json ContentType.
 type PutStepJSONRequestBody = Step
+
+// PostBookJSONRequestBody defines body for PostBook for application/json ContentType.
+type PostBookJSONRequestBody = Book

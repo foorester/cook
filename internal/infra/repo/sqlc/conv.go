@@ -14,7 +14,7 @@ func toInsertBookParams(b model.Book) (p InsertBookParams, err error) {
 		return p, errors.Wrap(InvalidResourceIDErr, "invalid book ID")
 	}
 
-	ownerID, ok := toPgUUID(b.Owner.ID)
+	ownerID, ok := toPgUUID(b.Owner.ID.Val())
 	if !ok {
 		return p, errors.Wrap(InvalidResourceIDErr, "invalid owner ID")
 	}

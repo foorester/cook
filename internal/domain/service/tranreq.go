@@ -29,6 +29,7 @@ type (
 type (
 	CreateBookReq struct {
 		UserID      string
+		Username    string
 		Name        string
 		Description string
 	}

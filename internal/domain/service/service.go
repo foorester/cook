@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/foorester/cook/internal/domain/model"
 	"github.com/foorester/cook/internal/domain/port"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/errors"
@@ -39,21 +40,22 @@ func (rs *Recipe) CreateBook(ctx context.Context, req CreateBookReq) (res Create
 	// Transport to Model
 	book := req.ToBook()
 
-	// Validate model
-	v := NewBookValidator(book)
-
-	err := v.ValidateForCreate()
-	if err != nil {
-		return NewCreateBookRes(v.Errors, err, rs.Cfg())
-	}
-
-	// Set Owner
-	user, err := rs.Repo().GetUser(ctx, req.UserID)
+	// Owner validation
+	user, err := rs.validateUser(ctx, req.UserID, req.Username)
 	if err != nil {
 		err = errors.Wrap(err, "create book error")
 		return NewCreateBookRes(nil, err, rs.Cfg())
 	}
 
+	// Model validation
+	v := NewBookValidator(book)
+
+	err = v.ValidateForCreate()
+	if err != nil {
+		return NewCreateBookRes(v.Errors, err, rs.Cfg())
+	}
+
+	// Set Owner
 	book.Owner = user
 
 	// Persist it
@@ -104,4 +106,17 @@ func (rs *Recipe) Start(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (rs *Recipe) validateUser(ctx context.Context, userID, username string) (user model.User, err error) {
+	ok, user, err := rs.Repo().IsValidUser(ctx, userID, username)
+	if err != nil {
+		return user, err
+	}
+
+	if !ok {
+		return user, errors.New("invalid username")
+	}
+
+	return user, nil
 }
