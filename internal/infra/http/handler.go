@@ -37,7 +37,7 @@ func NewCookHandler(svc service.RecipeService, opts ...sys.Option) *CookHandler 
 	}
 }
 
-func (h *CookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
+func (h *CookHandler) GetBooks(w http.ResponseWriter, r *http.Request, username string) {
 	//TODO not implemented yet
 	_, err := w.Write([]byte("GetBooks not implemented yet"))
 	if err != nil {
@@ -45,15 +45,13 @@ func (h *CookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *CookHandler) PostBook(w http.ResponseWriter, r *http.Request) {
-	// Session
+func (h *CookHandler) PostBook(w http.ResponseWriter, r *http.Request, username string) {
 	userID, err := h.User(r)
 	if err != nil {
 		err = errors.Wrap(err, "post book error")
 		h.handleError(w, err)
 	}
 
-	// Request to Transport
 	defer h.closeBody(r.Body)
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -65,9 +63,10 @@ func (h *CookHandler) PostBook(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.handleError(w, InvalidRequestDataErr)
 	}
-	book.UserID = userID
 
-	// Use svc to save the model
+	book.UserID = userID
+	book.Username = username
+
 	ctx := r.Context()
 	res := h.Service().CreateBook(ctx, book)
 	if err = res.Err(); err != nil {
