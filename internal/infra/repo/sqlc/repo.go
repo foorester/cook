@@ -73,18 +73,45 @@ func (cr *CookRepo) Conn(ctx context.Context) (*pgx.Conn, error) {
 	return cr.db.PGXConn(ctx)
 }
 
+func (cr *CookRepo) IsValidUser(ctx context.Context, userID, username string) (ok bool, user model.User, err error) {
+	// WIP: Mock implementation
+	uid, err := uuid.Parse("c4c109ad-f178-400a-b86d-3b0d548d852c")
+	if err != nil {
+		return false, user, InvalidResourceIDErr
+	}
+
+	ref := model.User{
+		ID:       model.NewID(uid),
+		Username: "johndoe",
+	}
+
+	_, err = uuid.Parse(userID)
+	if err != nil {
+		return false, user, InvalidResourceIDErr
+	}
+
+	if userID != ref.ID.String() || username != ref.Username {
+		return false, user, nil
+	}
+
+	return true, ref, nil
+}
+
 func (cr *CookRepo) GetUser(ctx context.Context, userID string) (user model.User, err error) {
 	// WIP: Mock implementation
-	ref := "c4c109ad-f178-400a-b86d-3b0d548d852c"
-
-	uid, err := uuid.Parse(userID)
+	uid, err := uuid.Parse("c4c109ad-f178-400a-b86d-3b0d548d852c")
 	if err != nil {
 		return user, InvalidResourceIDErr
 	}
 
-	if userID == ref {
+	uid, err = uuid.Parse(userID)
+	if err != nil {
+		return user, InvalidResourceIDErr
+	}
+
+	if userID == uid.String() {
 		return model.User{
-			ID:       uid,
+			ID:       model.NewID(uid),
 			Username: "johndoe",
 			Name:     "John Doe",
 			Email:    "john.doe@localhost.com",

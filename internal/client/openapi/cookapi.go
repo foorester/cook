@@ -89,14 +89,6 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// GetBooks request
-	GetBooks(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PostBook request with any body
-	PostBookWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PostBook(ctx context.Context, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// DeleteBook request
 	DeleteBook(ctx context.Context, bookId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -161,42 +153,14 @@ type ClientInterface interface {
 	PutStepWithBody(ctx context.Context, bookId string, recipeId string, stepId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	PutStep(ctx context.Context, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-}
 
-func (c *Client) GetBooks(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetBooksRequest(c.Server)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
+	// GetBooks request
+	GetBooks(ctx context.Context, username string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-func (c *Client) PostBookWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostBookRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
+	// PostBook request with any body
+	PostBookWithBody(ctx context.Context, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-func (c *Client) PostBook(ctx context.Context, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostBookRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
+	PostBook(ctx context.Context, username string, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) DeleteBook(ctx context.Context, bookId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -487,71 +451,40 @@ func (c *Client) PutStep(ctx context.Context, bookId string, recipeId string, st
 	return c.Client.Do(req)
 }
 
-// NewGetBooksRequest generates requests for GetBooks
-func NewGetBooksRequest(server string) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
+func (c *Client) GetBooks(ctx context.Context, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBooksRequest(c.Server, username)
 	if err != nil {
 		return nil, err
 	}
-
-	operationPath := fmt.Sprintf("/books")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
 		return nil, err
 	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
+	return c.Client.Do(req)
 }
 
-// NewPostBookRequest calls the generic PostBook builder with application/json body
-func NewPostBookRequest(server string, body PostBookJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
+func (c *Client) PostBookWithBody(ctx context.Context, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostBookRequestWithBody(c.Server, username, contentType, body)
 	if err != nil {
 		return nil, err
 	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPostBookRequestWithBody(server, "application/json", bodyReader)
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
-// NewPostBookRequestWithBody generates requests for PostBook with any type of body
-func NewPostBookRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
+func (c *Client) PostBook(ctx context.Context, username string, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostBookRequest(c.Server, username, body)
 	if err != nil {
 		return nil, err
 	}
-
-	operationPath := fmt.Sprintf("/books")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
 		return nil, err
 	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
+	return c.Client.Do(req)
 }
 
 // NewDeleteBookRequest generates requests for DeleteBook
@@ -1342,6 +1275,87 @@ func NewPutStepRequestWithBody(server string, bookId string, recipeId string, st
 	return req, nil
 }
 
+// NewGetBooksRequest generates requests for GetBooks
+func NewGetBooksRequest(server string, username string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "username", runtime.ParamLocationPath, username)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/%s/books", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostBookRequest calls the generic PostBook builder with application/json body
+func NewPostBookRequest(server string, username string, body PostBookJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostBookRequestWithBody(server, username, "application/json", bodyReader)
+}
+
+// NewPostBookRequestWithBody generates requests for PostBook with any type of body
+func NewPostBookRequestWithBody(server string, username string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "username", runtime.ParamLocationPath, username)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/%s/books", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -1385,14 +1399,6 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetBooks request
-	GetBooksWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetBooksResponse, error)
-
-	// PostBook request with any body
-	PostBookWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostBookResponse, error)
-
-	PostBookWithResponse(ctx context.Context, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*PostBookResponse, error)
-
 	// DeleteBook request
 	DeleteBookWithResponse(ctx context.Context, bookId string, reqEditors ...RequestEditorFn) (*DeleteBookResponse, error)
 
@@ -1457,50 +1463,14 @@ type ClientWithResponsesInterface interface {
 	PutStepWithBodyWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutStepResponse, error)
 
 	PutStepWithResponse(ctx context.Context, bookId string, recipeId string, stepId string, body PutStepJSONRequestBody, reqEditors ...RequestEditorFn) (*PutStepResponse, error)
-}
 
-type GetBooksResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *BookList
-}
+	// GetBooks request
+	GetBooksWithResponse(ctx context.Context, username string, reqEditors ...RequestEditorFn) (*GetBooksResponse, error)
 
-// Status returns HTTPResponse.Status
-func (r GetBooksResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
+	// PostBook request with any body
+	PostBookWithBodyWithResponse(ctx context.Context, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostBookResponse, error)
 
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetBooksResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type PostBookResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *Book
-}
-
-// Status returns HTTPResponse.Status
-func (r PostBookResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r PostBookResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
+	PostBookWithResponse(ctx context.Context, username string, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*PostBookResponse, error)
 }
 
 type DeleteBookResponse struct {
@@ -1872,30 +1842,48 @@ func (r PutStepResponse) StatusCode() int {
 	return 0
 }
 
-// GetBooksWithResponse request returning *GetBooksResponse
-func (c *ClientWithResponses) GetBooksWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetBooksResponse, error) {
-	rsp, err := c.GetBooks(ctx, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetBooksResponse(rsp)
+type GetBooksResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *BookList
 }
 
-// PostBookWithBodyWithResponse request with arbitrary body returning *PostBookResponse
-func (c *ClientWithResponses) PostBookWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostBookResponse, error) {
-	rsp, err := c.PostBookWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
+// Status returns HTTPResponse.Status
+func (r GetBooksResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
 	}
-	return ParsePostBookResponse(rsp)
+	return http.StatusText(0)
 }
 
-func (c *ClientWithResponses) PostBookWithResponse(ctx context.Context, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*PostBookResponse, error) {
-	rsp, err := c.PostBook(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetBooksResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
 	}
-	return ParsePostBookResponse(rsp)
+	return 0
+}
+
+type PostBookResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *Book
+}
+
+// Status returns HTTPResponse.Status
+func (r PostBookResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostBookResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 // DeleteBookWithResponse request returning *DeleteBookResponse
@@ -2107,56 +2095,30 @@ func (c *ClientWithResponses) PutStepWithResponse(ctx context.Context, bookId st
 	return ParsePutStepResponse(rsp)
 }
 
-// ParseGetBooksResponse parses an HTTP response from a GetBooksWithResponse call
-func ParseGetBooksResponse(rsp *http.Response) (*GetBooksResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
+// GetBooksWithResponse request returning *GetBooksResponse
+func (c *ClientWithResponses) GetBooksWithResponse(ctx context.Context, username string, reqEditors ...RequestEditorFn) (*GetBooksResponse, error) {
+	rsp, err := c.GetBooks(ctx, username, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-
-	response := &GetBooksResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest BookList
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
+	return ParseGetBooksResponse(rsp)
 }
 
-// ParsePostBookResponse parses an HTTP response from a PostBookWithResponse call
-func ParsePostBookResponse(rsp *http.Response) (*PostBookResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
+// PostBookWithBodyWithResponse request with arbitrary body returning *PostBookResponse
+func (c *ClientWithResponses) PostBookWithBodyWithResponse(ctx context.Context, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostBookResponse, error) {
+	rsp, err := c.PostBookWithBody(ctx, username, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
+	return ParsePostBookResponse(rsp)
+}
 
-	response := &PostBookResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
+func (c *ClientWithResponses) PostBookWithResponse(ctx context.Context, username string, body PostBookJSONRequestBody, reqEditors ...RequestEditorFn) (*PostBookResponse, error) {
+	rsp, err := c.PostBook(ctx, username, body, reqEditors...)
+	if err != nil {
+		return nil, err
 	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest Book
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON201 = &dest
-
-	}
-
-	return response, nil
+	return ParsePostBookResponse(rsp)
 }
 
 // ParseDeleteBookResponse parses an HTTP response from a DeleteBookWithResponse call
@@ -2546,6 +2508,58 @@ func ParsePutStepResponse(rsp *http.Response) (*PutStepResponse, error) {
 	response := &PutStepResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseGetBooksResponse parses an HTTP response from a GetBooksWithResponse call
+func ParseGetBooksResponse(rsp *http.Response) (*GetBooksResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetBooksResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest BookList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostBookResponse parses an HTTP response from a PostBookWithResponse call
+func ParsePostBookResponse(rsp *http.Response) (*PostBookResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostBookResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest Book
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
 	}
 
 	return response, nil

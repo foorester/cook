@@ -13,8 +13,8 @@ run:
 	go run ./main.go --config-file=configs/config.yml
 
 # OpenAPI
-.PHONY: openapihttp
-openapihttp:
+.PHONY: gen/openapihttp
+gen/openapihttp:
 	oapi-codegen -version
 	oapi-codegen -generate types -o internal/infra/openapi/cooktypes.go -package openapi api/openapi/cook.yaml
 	oapi-codegen -generate chi-server -o internal/infra/openapi/cookapi.go -package openapi api/openapi/cook.yaml
@@ -22,11 +22,11 @@ openapihttp:
 	oapi-codegen -generate client -o internal/client/openapi/cookapi.go -package openapi api/openapi/cook.yaml
 
 .PHONY: sqlc/gen
-sqlc/gen:
+gen/sqlc:
 	sqlc generate -f ./configs/sqlc/pg.sqlc.yaml
 
-.PHONY: pgall
-pgall:
+.PHONY: pg/concat-migrations
+pg/concat-migrations:
 	# Merge all migrations into one single file and move it to `/.tmp`
 	# Execute make command with sudo
 	# psql: `\i /.tmp/pgall.sql`
@@ -39,6 +39,10 @@ pgall:
 .PHONY: api/create-book
 api/create-book:
 	./scripts/curl/create-book.sh -h localhost -p 8080 -n "Recipe Book One" -d "Favorite Recipes"
+
+.PHONY: api/get-books
+api/get-books:
+	./scripts/curl/get-books.sh -h localhost -p 8080 -n "Recipe Book One" -d "Favorite Recipes"
 
 # Testing
 .PHONY: install/gomock
@@ -85,3 +89,4 @@ test:
 .PHONY: docker/test
 docker/test:
 	make -f makefile.test compose-test
+

@@ -14,12 +14,6 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Retrieve all books
-	// (GET /books)
-	GetBooks(w http.ResponseWriter, r *http.Request)
-	// Create a new book
-	// (POST /books)
-	PostBook(w http.ResponseWriter, r *http.Request)
 	// Delete a specific book
 	// (DELETE /books/{bookId})
 	DeleteBook(w http.ResponseWriter, r *http.Request, bookId string)
@@ -71,6 +65,12 @@ type ServerInterface interface {
 	// Update a specific step in a recipe
 	// (PUT /books/{bookId}/recipes/{recipeId}/steps/{stepId})
 	PutStep(w http.ResponseWriter, r *http.Request, bookId string, recipeId string, stepId string)
+	// Retrieve all books
+	// (GET /{username}/books)
+	GetBooks(w http.ResponseWriter, r *http.Request, username string)
+	// Create a new book
+	// (POST /{username}/books)
+	PostBook(w http.ResponseWriter, r *http.Request, username string)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -81,40 +81,6 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
-
-// GetBooks operation middleware
-func (siw *ServerInterfaceWrapper) GetBooks(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetBooks(w, r)
-	})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// PostBook operation middleware
-func (siw *ServerInterfaceWrapper) PostBook(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PostBook(w, r)
-	})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
 
 // DeleteBook operation middleware
 func (siw *ServerInterfaceWrapper) DeleteBook(w http.ResponseWriter, r *http.Request) {
@@ -745,6 +711,62 @@ func (siw *ServerInterfaceWrapper) PutStep(w http.ResponseWriter, r *http.Reques
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
+// GetBooks operation middleware
+func (siw *ServerInterfaceWrapper) GetBooks(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "username" -------------
+	var username string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "username", runtime.ParamLocationPath, chi.URLParam(r, "username"), &username)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "username", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetBooks(w, r, username)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PostBook operation middleware
+func (siw *ServerInterfaceWrapper) PostBook(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "username" -------------
+	var username string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "username", runtime.ParamLocationPath, chi.URLParam(r, "username"), &username)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "username", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostBook(w, r, username)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -859,12 +881,6 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/books", wrapper.GetBooks)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/books", wrapper.PostBook)
-	})
-	r.Group(func(r chi.Router) {
 		r.Delete(options.BaseURL+"/books/{bookId}", wrapper.DeleteBook)
 	})
 	r.Group(func(r chi.Router) {
@@ -914,6 +930,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Put(options.BaseURL+"/books/{bookId}/recipes/{recipeId}/steps/{stepId}", wrapper.PutStep)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/{username}/books", wrapper.GetBooks)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/{username}/books", wrapper.PostBook)
 	})
 
 	return r

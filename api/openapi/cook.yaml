@@ -13,19 +13,35 @@ servers:
         default: localhost
 security:
   - bearerAuth: []
+
 paths:
-  /books:
+  '/{username}/books':
     get:
       summary: Retrieve all books
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Successful response
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookList'
+
     post:
       summary: Create a new book
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -34,11 +50,12 @@ paths:
               $ref: '#/components/schemas/Book'
       responses:
         '201':
-          description: Book created
+          description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Book'
+
   /books/{bookId}:
     get:
       summary: Retrieve a specific book
@@ -437,6 +454,7 @@ paths:
           responses:
             '204':
               description: Direction step deleted
+
 components:
   schemas:
     Book:
