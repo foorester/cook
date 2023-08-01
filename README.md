@@ -18,13 +18,21 @@ Two packages will be included, one for utilizing the service's functionality fro
 
 The ability to validate JWT tokens is planned.
 
-There will be a separate code generator repository that utilizes Cook as a foundation for creating simple RESTful microservices specifically tailored for managing an intrinsically related group of resources (list-item, recipe-ingredient-directions, course-students, etc). The [code generator](https://github.com/foorester/crud) will provide developers with the ability to quickly generate the basic structure and functionality and extended later if required.
+There will be a separate code generator repository that utilizes Cook as a foundation for creating simple RESTful microservices & micromonolith. The [code generator](https://github.com/foorester/crud) will provide developers with the ability to quickly generate the basic structure and functionality and extended later if required.
 
-This code generator will offer the flexibility to enable essential features for your project, such as SSR, Isomorphic client, user authentication, persistence engines, and more, while avoiding the inclusion of unused code in the application.While the generated code will be optimized for managing a small set of resources, developers will be not limited to this constraints and will be able to adapt and modify the generated code to suit their specific and more complex use cases.
+This code generator will offer the flexibility to enable essential features for your project, such as SSR, and even some embedded SPA and/or at least, pages with some intelligence, dynamism and the ability to execute web request in the background (*). Eventually an Isomorphic client can be part of the implementation as an addition or as an alternative to the to the two options mentioned. This will be defined later. 
+
+An Isomorphic client , user authentication, persistence engines, and more, while avoiding the inclusion of unused code in the application.While the generated code will be optimized for managing a small set of resources, developers will be not limited to this constraints and will be able to adapt and modify the generated code to suit their specific and more complex use cases.
 
 Finally, we recognize the significance of Test-driven development (TDD) principles. As the project's structure solidifies, our intention is to achieve comprehensive test coverage, addressing every aspect thoroughly.
 
-[Backlog](https://github.com/orgs/foorester/projects/1/views/1)
+
+<sub>
+(*) Svelte is a strong candidate to implement this feature.
+</sub>
+
+## Backlog
+* [Foorester Cook Backlog](https://github.com/orgs/foorester/projects/1/views/1)
 
 ## Usage
 ```shell
