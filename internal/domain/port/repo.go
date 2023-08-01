@@ -14,8 +14,8 @@ type (
 
 	CookRepo interface {
 		Repo
-		IsValidUser(ctx context.Context, userID, username string) (ok bool, user model.User, err error)
 		GetUser(ctx context.Context, userID string) (user model.User, err error)
+		GetUserByIDAndUsername(ctx context.Context, userID, username string) (ok bool, user model.User, err error)
 		CreateBook(ctx context.Context, recipe model.Book) error
 		CreateRecipe(ctx context.Context, recipe model.Recipe) error
 	}
