@@ -38,11 +38,11 @@ pg/concat-migrations:
 # CURL
 .PHONY: api/create-book
 api/create-book:
-	./scripts/curl/create-book.sh -h localhost -p 8080 -n "Recipe Book One" -d "Favorite Recipes"
+	./scripts/curl/create-book.sh -h localhost -p 8080 -u "johndoe" -n "Recipe Book One" -d "Favorite Recipes"
 
 .PHONY: api/get-books
 api/get-books:
-	./scripts/curl/get-books.sh -h localhost -p 8080 -n "Recipe Book One" -d "Favorite Recipes"
+	./scripts/curl/get-books.sh -h localhost -p 8080 -u "johndoe"
 
 # Testing
 .PHONY: install/gomock

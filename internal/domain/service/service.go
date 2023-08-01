@@ -109,7 +109,7 @@ func (rs *Recipe) Start(ctx context.Context) error {
 }
 
 func (rs *Recipe) validateUser(ctx context.Context, userID, username string) (user model.User, err error) {
-	ok, user, err := rs.Repo().IsValidUser(ctx, userID, username)
+	ok, user, err := rs.Repo().GetUserByIDAndUsername(ctx, userID, username)
 	if err != nil {
 		return user, err
 	}
