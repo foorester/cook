@@ -56,7 +56,7 @@ func NewReqLoggerMiddleware(log log.Logger) func(next http.Handler) http.Handler
 		rl := NewReqLogger(log)
 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			entry := rl.NewLogEntry(r.Context())
+			entry := rl.NewLogEntry(r)
 			ww := NewWrapResponseWriter(w)
 
 			t1 := time.Now()
@@ -69,10 +69,8 @@ func NewReqLoggerMiddleware(log log.Logger) func(next http.Handler) http.Handler
 	}
 }
 
-func (rl *ReqLogger) NewLogEntry(ctx context.Context) middleware.LogEntry {
+func (rl *ReqLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 	fields := map[string]string{}
-
-	r := ctx.Value(ReqCtxKey).(*http.Request)
 
 	reqID := r.Header.Get("X-Request-Id")
 	if reqID != "" {
