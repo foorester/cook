@@ -1,4 +1,4 @@
-package service
+package transport
 
 import "github.com/foorester/cook/internal/sys/errors"
 

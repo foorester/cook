@@ -73,7 +73,7 @@ func (cr *CookRepo) Conn(ctx context.Context) (*pgx.Conn, error) {
 	return cr.db.PGXConn(ctx)
 }
 
-func (cr *CookRepo) GetUserByIDAndUsername(ctx context.Context, userID, username string) (ok bool, user model.User, err error) {
+func (cr *CookRepo) GetUserByIDAndUsername(ctx context.Context, userID uuid.UUID, username string) (ok bool, user model.User, err error) {
 	// WIP: Mock implementation
 	uid, err := uuid.Parse("c4c109ad-f178-400a-b86d-3b0d548d852c")
 	if err != nil {
@@ -85,12 +85,7 @@ func (cr *CookRepo) GetUserByIDAndUsername(ctx context.Context, userID, username
 		Username: "johndoe",
 	}
 
-	_, err = uuid.Parse(userID)
-	if err != nil {
-		return false, user, InvalidResourceIDErr
-	}
-
-	if userID != ref.ID.String() || username != ref.Username {
+	if userID != ref.ID.Val() || username != ref.Username {
 		return false, user, nil
 	}
 

@@ -1,4 +1,4 @@
-package service
+package transport
 
 import (
 	core "github.com/foorester/cook/internal/domain"
@@ -40,31 +40,5 @@ func NewServiceRes(valErrSet core.ValErrorSet, err error, cfg *config.Config) Se
 		exposeInternal: cfg.GetBool(config.Key.APIErrorExposeInt),
 		valErrSet:      valErrSet,
 		err:            err,
-	}
-}
-
-type (
-	CreateBookRes struct {
-		ServiceRes
-		ID string
-	}
-)
-
-func NewCreateBookRes(valErrSet core.ValErrorSet, err error, cfg *config.Config) CreateBookRes {
-	return CreateBookRes{
-		ServiceRes: NewServiceRes(valErrSet, err, cfg),
-	}
-}
-
-type (
-	CreateRecipeRes struct {
-		ServiceRes
-		ID string
-	}
-)
-
-func NewCreateRecipeRes(valErrSet core.ValErrorSet, err error, cfg *config.Config) CreateRecipeRes {
-	return CreateRecipeRes{
-		ServiceRes: NewServiceRes(valErrSet, err, cfg),
 	}
 }
