@@ -46,29 +46,6 @@ func (cr *CookRepo) DB(ctx context.Context) (db db.DB) {
 	return cr.db
 }
 
-func (cr *CookRepo) CreateBook(ctx context.Context, b model.Book) (err error) {
-	b.GenID()
-
-	args, err := toInsertBookParams(b)
-	if err != nil {
-		return errors.Wrap(err, "create book err")
-	}
-
-	conn, err := cr.Conn(ctx)
-	if err != nil {
-		return errors.Wrap(err, "create book err")
-	}
-
-	queries := NewQueries(conn)
-	_, err = queries.InsertBook(ctx, args)
-
-	return err
-}
-
-func (cr *CookRepo) CreateRecipe(ctx context.Context, r model.Recipe) (err error) {
-	return errors.New("not implemented yet")
-}
-
 func (cr *CookRepo) Conn(ctx context.Context) (*pgx.Conn, error) {
 	return cr.db.PGXConn(ctx)
 }
@@ -115,4 +92,69 @@ func (cr *CookRepo) GetUser(ctx context.Context, userID string) (user model.User
 	}
 
 	return user, UserNotFoundErr
+}
+
+func (cr *CookRepo) GetBooks(ctx context.Context, userID uuid.UUID) (books []model.Book, err error) {
+	ownerID, err := toPgUUID(userID)
+	if err != nil {
+		return books, errors.Wrap(err, "get books err")
+	}
+
+	conn, err := cr.Conn(ctx)
+	if err != nil {
+		return books, errors.Wrap(err, "create book err")
+	}
+
+	queries := New(conn)
+	rows, err := queries.SelectAllBooks(ctx, ownerID)
+	if err != nil {
+		return books, errors.Wrap(err, "get books err")
+	}
+
+	for _, row := range rows {
+		id, err := toID(row.ID)
+		if err != nil {
+			continue
+		}
+
+		book := model.Book{
+			ID:          id,
+			Name:        row.Name,
+			Description: row.Description,
+			Owner: model.User{
+				// NOTE: eventually a variadic preload boolean parameter will be added
+				// to the GetBooks method (`...preload bool`) to allow the caller
+				// to preload the owner in the same query including all his values.
+				ID: model.NewID(userID),
+			},
+			Audit: toAudit(row.CreatedAt, row.UpdatedAt),
+		}
+
+		books = append(books, book)
+	}
+
+	return books, nil
+}
+
+func (cr *CookRepo) CreateBook(ctx context.Context, b model.Book) (err error) {
+	b.GenID()
+
+	args, err := toInsertBookParams(b)
+	if err != nil {
+		return errors.Wrap(err, "create book err")
+	}
+
+	conn, err := cr.Conn(ctx)
+	if err != nil {
+		return errors.Wrap(err, "create book err")
+	}
+
+	queries := New(conn)
+	_, err = queries.InsertBook(ctx, args)
+
+	return err
+}
+
+func (cr *CookRepo) CreateRecipe(ctx context.Context, r model.Recipe) (err error) {
+	return errors.New("not implemented yet")
 }

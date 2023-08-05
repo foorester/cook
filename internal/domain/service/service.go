@@ -8,7 +8,7 @@ import (
 
 	"github.com/foorester/cook/internal/domain/model"
 	"github.com/foorester/cook/internal/domain/port"
-	"github.com/foorester/cook/internal/domain/transport"
+	t "github.com/foorester/cook/internal/domain/transport"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/errors"
 )
@@ -16,9 +16,9 @@ import (
 type (
 	RecipeService interface {
 		sys.Core
-		GetBooks(ctx context.Context, m transport.GetBooksReq) transport.GetBooksRes
-		CreateBook(ctx context.Context, m transport.CreateBookReq) transport.CreateBookRes
-		CreateRecipe(ctx context.Context, m transport.CreateRecipeReq) transport.CreateRecipeRes
+		GetBooks(ctx context.Context, m t.GetBooksReq) t.GetBooksRes
+		CreateBook(ctx context.Context, m t.CreateBookReq) t.CreateBookRes
+		CreateRecipe(ctx context.Context, m t.CreateRecipeReq) t.CreateRecipeRes
 	}
 
 	Recipe struct {
@@ -40,93 +40,69 @@ func NewService(rr port.CookRepo, opts ...sys.Option) *Recipe {
 	}
 }
 
-func (rs *Recipe) GetBooks(ctx context.Context, req transport.GetBooksReq) (res transport.GetBooksRes) {
-	//// Transport to Model
-	//book := req.ToBook()
-	//
-	//// Owner validation
-	//user, err := rs.validateUser(ctx, req.UserID, req.Username)
-	//if err != nil {
-	//	err = errors.Wrap(err, "create book error")
-	//	return NewCreateBookRes(nil, err, rs.Cfg())
-	//}
-	//
-	//// Model validation
-	//v := NewBookValidator(book)
-	//
-	//err = v.ValidateForCreate()
-	//if err != nil {
-	//	return NewCreateBookRes(v.Errors, err, rs.Cfg())
-	//}
-	//
-	//// Set Owner
-	//book.Owner = user
-	//
-	//// Persist it
-	//err = rs.Repo().CreateBook(ctx, book)
-	//if err != nil {
-	//	err = errors.Wrap(err, "create book error")
-	//	return NewCreateBookRes(nil, err, rs.Cfg())
-	//}
-	//
-	//return NewCreateBookRes(nil, nil, nil)
-	return res
+func (rs *Recipe) GetBooks(ctx context.Context, req t.GetBooksReq) (res t.GetBooksRes) {
+	_, err := rs.validateUser(ctx, req.UserID, req.Username)
+	if err != nil {
+		err = errors.Wrap(err, "get books error")
+		return t.NewGetBooksRes(nil, err, rs.Cfg())
+	}
+
+	books, err := rs.Repo().GetBooks(ctx, req.UserID)
+	if err != nil {
+		err = errors.Wrap(err, "create req error")
+		return t.NewGetBooksRes(nil, err, rs.Cfg())
+	}
+
+	res.SetBooks(books)
+
+	return t.NewGetBooksRes(nil, nil, nil)
 }
 
-func (rs *Recipe) CreateBook(ctx context.Context, req transport.CreateBookReq) (res transport.CreateBookRes) {
-	// Transport to Model
+func (rs *Recipe) CreateBook(ctx context.Context, req t.CreateBookReq) (res t.CreateBookRes) {
 	book := req.ToBook()
 
-	// Owner validation
 	user, err := rs.validateUser(ctx, req.UserID, req.Username)
 	if err != nil {
 		err = errors.Wrap(err, "create book error")
-		return transport.NewCreateBookRes(nil, err, rs.Cfg())
+		return t.NewCreateBookRes(nil, err, rs.Cfg())
 	}
 
-	// Model validation
 	v := NewBookValidator(book)
-
 	err = v.ValidateForCreate()
 	if err != nil {
-		return transport.NewCreateBookRes(v.Errors, err, rs.Cfg())
+		return t.NewCreateBookRes(v.Errors, err, rs.Cfg())
 	}
 
-	// Set Owner
 	book.Owner = user
 
-	// Persist it
 	err = rs.Repo().CreateBook(ctx, book)
 	if err != nil {
 		err = errors.Wrap(err, "create book error")
-		return transport.NewCreateBookRes(nil, err, rs.Cfg())
+		return t.NewCreateBookRes(nil, err, rs.Cfg())
 	}
 
-	return transport.NewCreateBookRes(nil, nil, nil)
+	return t.NewCreateBookRes(nil, nil, nil)
 }
 
-func (rs *Recipe) CreateRecipe(ctx context.Context, req transport.CreateRecipeReq) (res transport.CreateRecipeRes) {
-	// Transport to Model
+func (rs *Recipe) CreateRecipe(ctx context.Context, req t.CreateRecipeReq) (res t.CreateRecipeRes) {
 	recipe := req.ToRecipe()
 
-	// Validate model
 	v := NewRecipeValidator(recipe)
 
 	err := v.ValidateForCreate()
 	if err != nil {
-		return transport.NewCreateRecipeRes(v.Errors, err, rs.Cfg())
+		return t.NewCreateRecipeRes(v.Errors, err, rs.Cfg())
 	}
 
-	// Persist it
 	err = rs.Repo().CreateRecipe(ctx, recipe)
 	if err != nil {
 		err = errors.Wrap(err, "create recipe error")
-		return transport.NewCreateRecipeRes(nil, err, rs.Cfg())
+		return t.NewCreateRecipeRes(nil, err, rs.Cfg())
 	}
 
 	// Send a message to bus
 
-	return transport.NewCreateRecipeRes(nil, nil, nil)
+	return t.NewCreateRecipeRes(nil, nil, nil)
 }
 
 func (rs *Recipe) Repo() port.CookRepo {

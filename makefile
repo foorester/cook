@@ -23,7 +23,7 @@ gen/openapihttp:
 
 .PHONY: sqlc/gen
 gen/sqlc:
-	sqlc generate -f ./configs/sqlc/pg.sqlc.yaml
+	sqlc generate -f ./configs/sqlc/sqlc.pg.yaml
 
 .PHONY: pg/concat-migrations
 pg/concat-migrations:
