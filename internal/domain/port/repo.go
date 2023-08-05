@@ -19,6 +19,7 @@ type (
 		GetUser(ctx context.Context, userID string) (user model.User, err error)
 		GetUserByIDAndUsername(ctx context.Context, userID uuid.UUID, username string) (ok bool, user model.User, err error)
 		CreateBook(ctx context.Context, recipe model.Book) error
+		GetBooks(ctx context.Context, userID uuid.UUID) (books []model.Book, err error)
 		CreateRecipe(ctx context.Context, recipe model.Recipe) error
 	}
 )

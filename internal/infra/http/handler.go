@@ -41,7 +41,7 @@ func NewCookHandler(svc service.RecipeService, opts ...sys.Option) *CookHandler 
 func (h *CookHandler) GetBooks(w http.ResponseWriter, r *http.Request, username string) {
 	userID, err := h.User(r)
 	if err != nil {
-		err = errors.Wrap(err, "post bookReq error")
+		err = errors.Wrap(err, "get books error")
 		h.handleError(w, err)
 	}
 
@@ -52,7 +52,7 @@ func (h *CookHandler) GetBooks(w http.ResponseWriter, r *http.Request, username 
 	ctx := r.Context()
 	res := h.Service().GetBooks(ctx, bookReq)
 	if err = res.Err(); err != nil {
-		err = errors.Wrap(err, "post bookReq error")
+		err = errors.Wrap(err, "get books error")
 		h.handleError(w, err)
 	}
 }

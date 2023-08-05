@@ -6,4 +6,5 @@ var (
 	NoConnectionError    = errors.New("no connection error")
 	InvalidResourceIDErr = errors.New("invalid resource ID")
 	UserNotFoundErr      = errors.New("user not found")
+	InvalidTimeErr       = errors.New("invalid time")
 )
