@@ -74,7 +74,7 @@ docker/compose-down:
 	docker-compose -f deployments/docker/dev/docker-compose.yml down
 
 .PHONY: docker/reset-pg
-docker/rest-pg:
+	docker/rest-pg:
 	rm -rf tmp/postgres-data
 
 .PHONY: docker/psql

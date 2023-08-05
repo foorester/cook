@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/foorester/cook/internal/domain/service"
+	"github.com/foorester/cook/internal/domain/transport"
 	"github.com/foorester/cook/internal/infra/openapi"
 	"github.com/foorester/cook/internal/sys"
 	"github.com/foorester/cook/internal/sys/errors"
@@ -38,17 +39,28 @@ func NewCookHandler(svc service.RecipeService, opts ...sys.Option) *CookHandler 
 }
 
 func (h *CookHandler) GetBooks(w http.ResponseWriter, r *http.Request, username string) {
-	//TODO not implemented yet
-	_, err := w.Write([]byte("GetBooks not implemented yet"))
+	userID, err := h.User(r)
 	if err != nil {
-		h.Log().Error(err)
+		err = errors.Wrap(err, "post bookReq error")
+		h.handleError(w, err)
+	}
+
+	var bookReq transport.GetBooksReq
+	bookReq.UserID = userID
+	bookReq.Username = username
+
+	ctx := r.Context()
+	res := h.Service().GetBooks(ctx, bookReq)
+	if err = res.Err(); err != nil {
+		err = errors.Wrap(err, "post bookReq error")
+		h.handleError(w, err)
 	}
 }
 
 func (h *CookHandler) PostBook(w http.ResponseWriter, r *http.Request, username string) {
 	userID, err := h.User(r)
 	if err != nil {
-		err = errors.Wrap(err, "post book error")
+		err = errors.Wrap(err, "post bookReq error")
 		h.handleError(w, err)
 	}
 
@@ -58,19 +70,19 @@ func (h *CookHandler) PostBook(w http.ResponseWriter, r *http.Request, username 
 		h.handleError(w, InvalidRequestErr)
 	}
 
-	var book service.CreateBookReq
-	err = json.Unmarshal(body, &book)
+	var bookReq transport.CreateBookReq
+	err = json.Unmarshal(body, &bookReq)
 	if err != nil {
 		h.handleError(w, InvalidRequestDataErr)
 	}
 
-	book.UserID = userID
-	book.Username = username
+	bookReq.UserID = userID
+	bookReq.Username = username
 
 	ctx := r.Context()
-	res := h.Service().CreateBook(ctx, book)
+	res := h.Service().CreateBook(ctx, bookReq)
 	if err = res.Err(); err != nil {
-		err = errors.Wrap(err, "post book error")
+		err = errors.Wrap(err, "post bookReq error")
 		h.handleError(w, err)
 	}
 }
@@ -122,7 +134,7 @@ func (h *CookHandler) PostRecipe(w http.ResponseWriter, r *http.Request, bookID 
 		h.handleError(w, InvalidRequestErr)
 	}
 
-	var recipe service.CreateRecipeReq
+	var recipe transport.CreateRecipeReq
 	err = json.Unmarshal(body, &recipe)
 	if err != nil {
 		h.handleError(w, InvalidRequestDataErr)
@@ -237,17 +249,17 @@ func (h *CookHandler) PutIngredient(w http.ResponseWriter, r *http.Request, book
 
 // Helpers
 
-func (h *CookHandler) User(r *http.Request) (userID string, err error) {
+func (h *CookHandler) User(r *http.Request) (userID uuid.UUID, err error) {
 	// Authentication mechanism not yet established.
 	// WIP: A hardcoded value is returned for now.
 	uid := "c4c109ad-f178-400a-b86d-3b0d548d852c"
 
-	_, err = uuid.Parse(uid)
+	userID, err = uuid.Parse(uid)
 	if err != nil {
-		return "", NoUserErr
+		return userID, NoUserErr
 	}
 
-	return uid, nil
+	return userID, nil
 }
 
 // closeBody close the body and log errors if happened.
