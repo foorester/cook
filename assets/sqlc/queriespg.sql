@@ -29,9 +29,10 @@ FROM books b
 WHERE b.id = $1;
 
 -- name: SelectAllBooks :many
-SELECT b.id, b.name, b.description, u.id, u.username, u.name, u.email, u.password
+SELECT b.id, b.name, b.description, b.owner_id, b.created_at, b.updated_at
 FROM books b
-         JOIN users u ON b.owner_id = u.id;
+         JOIN users u ON b.owner_id = u.id
+WHERE b.owner_id = $1;
 
 -- name: InsertBook :one
 INSERT INTO books (id, name, description, owner_id)

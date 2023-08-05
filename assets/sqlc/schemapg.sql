@@ -7,7 +7,9 @@ CREATE TABLE users (
     username TEXT NOT NULL,
     name TEXT NOT NULL,
     email TEXT NOT NULL,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- Create the 'books' table
@@ -16,6 +18,8 @@ CREATE TABLE books (
     name TEXT NOT NULL,
     description TEXT NOT NULL,
     owner_id UUID NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (owner_id) REFERENCES users (id)
 );
 
@@ -25,6 +29,8 @@ CREATE TABLE recipes (
     name TEXT NOT NULL,
     description TEXT NOT NULL,
     book_id UUID NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (book_id) REFERENCES books (id)
 );
 
@@ -36,6 +42,8 @@ CREATE TABLE ingredients (
     recipe_id UUID NOT NULL,
     qty TEXT NOT NULL,
     unit TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (recipe_id) REFERENCES recipes (id)
 );
 
@@ -46,6 +54,8 @@ CREATE TABLE steps (
     description TEXT NOT NULL,
     recipe_id UUID NOT NULL,
     duration TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (recipe_id) REFERENCES recipes (id)
 );
 

@@ -13,6 +13,8 @@ type Book struct {
 	Name        string
 	Description string
 	OwnerID     pgtype.UUID
+	CreatedAt   pgtype.Timestamp
+	UpdatedAt   pgtype.Timestamp
 }
 
 type Ingredient struct {
@@ -22,6 +24,8 @@ type Ingredient struct {
 	RecipeID    pgtype.UUID
 	Qty         string
 	Unit        string
+	CreatedAt   pgtype.Timestamp
+	UpdatedAt   pgtype.Timestamp
 }
 
 type Recipe struct {
@@ -29,6 +33,8 @@ type Recipe struct {
 	Name        string
 	Description string
 	BookID      pgtype.UUID
+	CreatedAt   pgtype.Timestamp
+	UpdatedAt   pgtype.Timestamp
 }
 
 type Step struct {
@@ -37,12 +43,16 @@ type Step struct {
 	Description string
 	RecipeID    pgtype.UUID
 	Duration    string
+	CreatedAt   pgtype.Timestamp
+	UpdatedAt   pgtype.Timestamp
 }
 
 type User struct {
-	ID       pgtype.UUID
-	Username string
-	Name     string
-	Email    string
-	Password string
+	ID        pgtype.UUID
+	Username  string
+	Name      string
+	Email     string
+	Password  string
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
 }
