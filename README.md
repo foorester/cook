@@ -8,27 +8,17 @@ Cook is a simple example application that serves as a reference implementation f
 - This application aims to reduce reliance on external dependencies while maintaining flexibility. It adopts established industry libraries for tasks such as configuration, routing, and interface definition language, such as OpenAPI and gRPC, when necessary. A more stringent implementation strategy, focusing on utilizing Go's standard library extensively can be found here [https://github.com/vanillazen/stl](https://github.com/vanillazen/stl).
 - Use of Interfaces: Cook leverages interfaces to facilitate testing and enable the plugging in of alternative implementations, promoting modularity and flexibility.
 
-## Extensibility and Code Generation
+## Extensibility
 
-Cook is designed as a reference application that focuses on managing a couple of, recipes in this case, and provides a starting point for building Go based services.
+Cook is designed as a reference application that focuses on managing recipes and provides a starting reference point for building Go based services.
 
 Currently, the focus is on supporting SQLite, Postgres, and MongoDB. Since the database and repository functionalities are defined as interfaces in the service, there are no limitations preventing the creation of alternative implementations. 
 
-Two packages will be included, one for utilizing the service's functionality from a traditional HTML client (SSR), and another for generating an isomorphic client for the application.
+Our service includes a package that follows ROCA recommendations and implements a client-side architecture with a traditional HTML Server-Side Rendering (SSR) approach. For enhanced dynamism, this implementation may utilize popular libraries such as React, Vue, or Svelte to provide individual pages with interactive elements. The goal is to create a structured and efficient web application experience, similar to platforms like GitHub, where resource-oriented principles are combined with dynamic components for improved performance, scalability, and user engagement.
 
-The ability to validate JWT tokens is planned.
-
-There will be a separate code generator repository that utilizes Cook as a foundation for creating simple RESTful microservices & micromonolith. The [code generator](https://github.com/foorester/crud) will provide developers with the ability to quickly generate the basic structure and functionality and extended later if required.
+The ability to validate JWT tokens is also planned.
 
 Finally, we recognize the significance of Test-driven development (TDD) principles. As the project's structure solidifies, our intention is to achieve comprehensive test coverage, addressing every aspect thoroughly.
-
-
-<sub>
-(*) Svelte is a strong candidate to implement this feature.
-</sub>
-
-## Backlog
-* [Foorester Cook Backlog](https://github.com/orgs/foorester/projects/1/views/1)
 
 ## Usage
 ```shell
